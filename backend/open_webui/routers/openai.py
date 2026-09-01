@@ -47,6 +47,7 @@ from open_webui.utils.headers import get_custom_headers, include_user_info_heade
 from open_webui.utils.json_codec import JSONCodec
 from open_webui.utils.misc import convert_logit_bias_input_to_json
 from open_webui.utils.model_ids import strip_provider_model_prefix
+from open_webui.utils.openai_files import OpenAIFileForwardingError, forward_original_files
 from open_webui.utils.payload import (
     apply_model_params_to_body_openai,
     apply_system_prompt_to_body,
@@ -1361,6 +1362,19 @@ async def generate_chat_completion(
         payload = apply_responses_stateful_payload(payload, is_responses, ENABLE_RESPONSES_API_STATEFUL)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if api_config.get('files_api'):
+        try:
+            payload = await forward_original_files(
+                payload,
+                metadata=metadata,
+                user=user,
+                base_url=url,
+                headers=headers,
+                cookies=cookies,
+            )
+        except OpenAIFileForwardingError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 
     if api_config.get('azure') or api_config.get('provider') == 'azure':
         # Only set api-key header if not using Azure Entra ID authentication

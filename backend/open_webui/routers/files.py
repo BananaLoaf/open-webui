@@ -283,7 +283,9 @@ async def upload_file(
         request,
         file=file,
         metadata=metadata,
-        process=process,
+        # Hermes consumes the original bytes through OpenWebUI's Files API.
+        # Never duplicate uploads into OpenWebUI's RAG/vector pipeline.
+        process=False,
         process_in_background=process_in_background,
         user=user,
         background_tasks=background_tasks,
