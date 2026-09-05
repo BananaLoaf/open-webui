@@ -42,6 +42,15 @@ def _load_source_functions(relative_path: str, names: set[str], namespace: dict)
     return SimpleNamespace(**{name: compiled_namespace[name] for name in names})
 
 
+def _load_source_module(relative_path: str, module_name: str):
+    """Load one dependency-free production module from the working tree."""
+    source = Path(__file__).parents[1] / relative_path
+    spec = importlib.util.spec_from_file_location(module_name, source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def _run(coroutine):
     return asyncio.run(coroutine)
 
@@ -718,10 +727,9 @@ def test_public_upload_route_forces_raw_storage():
 
 
 def test_responses_converter_preserves_file_references_and_images():
-    source = _load_source_functions(
-        'backend/open_webui/routers/openai.py',
-        {'convert_to_responses_payload'},
-        {'_normalize_stored_item': lambda item: item},
+    source = _load_source_module(
+        'backend/open_webui/utils/responses_state.py',
+        'test_openai_files_responses_state',
     )
 
     result = source.convert_to_responses_payload(
@@ -830,11 +838,10 @@ def _openai_route_runtime(openai_files, api_config, forward_original_files):  # 
     def dependency(*args, **kwargs):
         return None
 
-    converter = _load_source_functions(
-        'backend/open_webui/routers/openai.py',
-        {'convert_to_responses_payload'},
-        {'_normalize_stored_item': lambda item: item},
-    ).convert_to_responses_payload
+    responses_state = _load_source_module(
+        'backend/open_webui/utils/responses_state.py',
+        'test_openai_files_route_responses_state',
+    )
     source = _load_source_functions(
         'backend/open_webui/routers/openai.py',
         {'generate_chat_completion'},
@@ -864,7 +871,9 @@ def _openai_route_runtime(openai_files, api_config, forward_original_files):  # 
             'apply_model_params_to_body_openai': lambda params, payload: payload,
             'apply_system_prompt_to_body': None,
             're': __import__('re'),
-            'convert_to_responses_payload': converter,
+            'apply_responses_stateful_payload': responses_state.apply_responses_stateful_payload,
+            'ENABLE_RESPONSES_API_STATEFUL': True,
+            'convert_to_responses_payload': responses_state.convert_to_responses_payload,
             'convert_to_azure_payload': None,
             'get_session': get_session,
             'get_client_timeout': lambda stream: None,
@@ -913,6 +922,7 @@ def test_openai_route_forwards_files_before_responses_conversion(openai_files):
                 'model': 'profile',
                 'messages': [{'role': 'user', 'content': 'Inspect'}],
                 'metadata': metadata,
+                'previous_response_id': 'resp-previous',
             },
             user,
         )
@@ -932,6 +942,8 @@ def test_openai_route_forwards_files_before_responses_conversion(openai_files):
         {'type': 'input_text', 'text': 'Inspect'},
         {'type': 'input_file', 'file_id': 'file-upstream', 'filename': 'report.pdf'},
     ]
+    assert json.loads(observed['data'])['previous_response_id'] == 'resp-previous'
+    assert json.loads(observed['data'])['store'] is True
     assert observed['cleaned'] is True
 
 
