@@ -1,4 +1,6 @@
+import ast
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -310,7 +312,7 @@ def test_openwebui_only_output_items_are_not_replayed(responses_state):
     assert responses_state.normalize_responses_input_item(item) is None
 
 
-def test_function_call_drops_only_openwebui_approval_state(responses_state):
+def test_function_call_drops_non_protocol_fields_like_upstream(responses_state):
     item = {
         'type': 'function_call',
         'id': 'fc_1',
@@ -327,7 +329,6 @@ def test_function_call_drops_only_openwebui_approval_state(responses_state):
         'call_id': 'call_1',
         'name': 'terminal',
         'arguments': '{}',
-        'status': 'completed',
     }
 
 
@@ -577,3 +578,121 @@ def test_non_streaming_incomplete_response_preserves_native_state(responses_stat
     assert result['response_status'] == 'incomplete'
     assert result['incomplete_details'] == details
     assert result['choices'][0]['finish_reason'] == 'incomplete'
+
+
+def test_converted_chat_tools_default_to_non_strict_like_upstream(responses_state):
+    result = responses_state.convert_to_responses_payload(
+        {'messages': [], 'tools': [{'type': 'function', 'function': {'name': 'lookup', 'parameters': {}}}]}
+    )
+    assert result['tools'][0]['strict'] is False
+
+
+def test_tool_search_replay_preserves_the_provider_call(responses_state):
+    item = {
+        'type': 'function_call',
+        'call_id': 'call_1',
+        'id': 'fc_1',
+        'name': 'terminal',
+        'arguments': '{"command":"pwd"}',
+        'provider_function': {'name': 'call_tool', 'arguments': {'name': 'terminal', 'arguments': {'command': 'pwd'}}},
+        'approved': True,
+        'status': 'completed',
+    }
+    result = responses_state.normalize_responses_input_item(item)
+    assert result['name'] == 'call_tool'
+    assert json.loads(result['arguments']) == item['provider_function']['arguments']
+    assert set(result) == {'type', 'call_id', 'id', 'name', 'arguments'}
+
+
+def test_stored_message_drops_bookkeeping_like_upstream(responses_state):
+    item = {'type': 'message', 'role': 'assistant', 'content': [], 'id': 'local', 'status': 'completed', 'files': []}
+    assert responses_state.normalize_responses_input_item(item) == {
+        'type': 'message',
+        'role': 'assistant',
+        'content': [],
+    }
+
+
+def test_non_streaming_tool_calls_keep_upstream_chat_compatibility(responses_state):
+    response = {
+        'id': 'resp_1',
+        'status': 'completed',
+        'output': [
+            {'type': 'function_call', 'call_id': 'call_1', 'name': 'lookup', 'arguments': {'query': 'test'}},
+        ],
+    }
+    result = responses_state.convert_responses_result(response)
+    choice = result['choices'][0]
+    assert choice['finish_reason'] == 'tool_calls'
+    assert json.loads(choice['message']['tool_calls'][0]['function']['arguments']) == {'query': 'test'}
+    assert result['response_id'] == 'resp_1'
+    assert result['response_status'] == 'completed'
+    assert result['output'] == response['output']
+
+
+@pytest.mark.parametrize('status', ['completed', 'failed', 'cancelled', 'incomplete'])
+def test_terminal_event_without_explicit_status_still_finishes(responses_state, status):
+    _, metadata = responses_state.handle_responses_lifecycle_event(f'response.{status}', {'id': 'resp_1'}, [])
+    assert metadata['done'] is True
+    assert metadata['response_status'] == status
+
+
+def test_upstream_shared_stream_handler_keeps_lifecycle_and_error_support(responses_state):
+    source = Path(__file__).parents[1] / 'backend/open_webui/utils/response.py'
+    tree = ast.parse(source.read_text())
+    functions = [
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name
+        in {
+            'deep_merge',
+            'handle_responses_streaming_event',
+        }
+    ]
+    namespace = {'handle_responses_lifecycle_event': responses_state.handle_responses_lifecycle_event}
+    exec(compile(ast.Module(body=functions, type_ignores=[]), str(source), 'exec'), namespace)
+    handler = namespace['handle_responses_streaming_event']
+    output = [{'type': 'message', 'content': []}]
+    new_output, metadata = handler(
+        {
+            'type': 'response.incomplete',
+            'response': {
+                'id': 'resp_1',
+                'status': 'incomplete',
+                'incomplete_details': {'reason': 'max_output_tokens'},
+            },
+        },
+        output,
+    )
+    assert new_output == output
+    assert metadata['done'] is True
+    assert metadata['incomplete_details'] == {'reason': 'max_output_tokens'}
+    error = {'type': 'error', 'message': 'upstream failed'}
+    assert handler(error, output) == (output, {'error': error})
+
+
+def test_middleware_uses_shared_handler_and_new_four_value_contract():
+    source = Path(__file__).parents[1] / 'backend/open_webui/utils/middleware.py'
+    tree = ast.parse(source.read_text())
+    assert not any(
+        isinstance(node, ast.FunctionDef) and node.name == 'handle_responses_streaming_event' for node in tree.body
+    )
+    process = next(
+        node for node in tree.body if isinstance(node, ast.AsyncFunctionDef) and node.name == 'process_chat_payload'
+    )
+    returns = []
+
+    class OwnReturns(ast.NodeVisitor):
+        def visit_Return(self, node):
+            returns.append(node)
+
+        def visit_FunctionDef(self, node):
+            pass
+
+        def visit_AsyncFunctionDef(self, node):
+            if node is process:
+                self.generic_visit(node)
+
+    OwnReturns().visit(process)
+    assert returns and all(isinstance(node.value, ast.Tuple) and len(node.value.elts) == 4 for node in returns)

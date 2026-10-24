@@ -1,5 +1,7 @@
 """Shared stateful Responses API policy used by routing and chat middleware."""
 
+import json
+
 RESPONSES_TERMINAL_STATUSES = frozenset({'completed', 'failed', 'cancelled', 'incomplete'})
 RESPONSES_LIFECYCLE_EVENTS = frozenset(
     {
@@ -23,6 +25,11 @@ RESPONSES_LOCAL_ITEM_FIELDS = frozenset(
         'started_at',
     }
 )
+RESPONSES_ALLOWED_FIELDS = {
+    'message': {'type', 'role', 'content'},
+    'function_call': {'type', 'call_id', 'name', 'arguments', 'id'},
+    'function_call_output': {'type', 'call_id', 'output'},
+}
 
 
 def get_stateful_response_id(messages_map: dict, user_message_id: str, model_id: str | None) -> str | None:
@@ -100,6 +107,10 @@ def handle_responses_lifecycle_event(
     if event_type not in RESPONSES_LIFECYCLE_EVENTS:
         return None
 
+    event_status = event_type.removeprefix('response.')
+    if not response.get('status') and event_status in RESPONSES_TERMINAL_STATUSES | {'queued', 'in_progress'}:
+        response = {**response, 'status': event_status}
+
     final_output = response.get('output')
     output = final_output if final_output else current_output
     if event_type == 'response.completed':
@@ -121,10 +132,19 @@ def normalize_responses_input_item(item: dict) -> dict | None:
     normalized = dict(item)
     if item_type in {'message', 'reasoning', 'function_call', 'function_call_output'}:
         normalized = {key: value for key, value in normalized.items() if key not in RESPONSES_LOCAL_ITEM_FIELDS}
-    if item_type == 'function_call_output':
-        return {key: normalized[key] for key in ('type', 'call_id', 'output') if key in normalized}
     if item_type == 'function_call':
-        normalized.pop('approved', None)
+        # Tool Search may execute a resolved tool while the provider called call_tool.
+        # Replay the provider's original call, matching upstream get_provider_function.
+        function = item.get('provider_function')
+        if not isinstance(function, dict):
+            function = item
+        arguments = function.get('arguments', '{}')
+        normalized.update(
+            name=function.get('name', ''),
+            arguments=arguments if isinstance(arguments, str) else json.dumps(arguments),
+        )
+    if allowed := RESPONSES_ALLOWED_FIELDS.get(item_type):
+        return {key: value for key, value in normalized.items() if key in allowed}
     return normalized
 
 
@@ -281,6 +301,8 @@ def _convert_responses_tools(payload: dict) -> None:
         payload['tools'] = [
             {
                 'type': tool.get('type', 'function'),
+                # Responses defaults to strict=true; Chat Completions defaults to false.
+                'strict': False,
                 **tool.get('function', {}),
             }
             if isinstance(tool, dict) and isinstance(tool.get('function'), dict)
@@ -366,11 +388,24 @@ def convert_responses_result(response: dict) -> dict:
     """Convert a non-streaming Responses result for the chat completion middleware."""
     output_items = response.get('output', [])
     content = ''
+    tool_calls = []
     for item in output_items:
         if item.get('type') == 'message':
             for part in item.get('content', []):
                 if part.get('type') == 'output_text':
                     content += part.get('text', '')
+        elif item.get('type') == 'function_call':
+            arguments = item.get('arguments', '{}')
+            tool_calls.append(
+                {
+                    'id': item.get('call_id', ''),
+                    'type': 'function',
+                    'function': {
+                        'name': item.get('name', ''),
+                        'arguments': arguments if isinstance(arguments, str) else json.dumps(arguments),
+                    },
+                }
+            )
 
     status = response.get('status')
     result = {
@@ -386,8 +421,9 @@ def convert_responses_result(response: dict) -> dict:
                 'message': {
                     'role': 'assistant',
                     'content': content,
+                    **({'tool_calls': tool_calls} if tool_calls else {}),
                 },
-                'finish_reason': 'stop' if status in (None, 'completed') else status,
+                'finish_reason': ('tool_calls' if tool_calls else 'stop') if status in (None, 'completed') else status,
             }
         ],
         'usage': response.get('usage', {}),
