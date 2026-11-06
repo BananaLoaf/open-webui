@@ -233,7 +233,7 @@
 				aria-checked={selected}
 				aria-label={$i18n.t('Select {{name}}', { name: entry.name })}
 				class="mr-2 flex size-3.5 shrink-0 items-center justify-center rounded border transition-colors {selected
-					? 'bg-gray-900 border-gray-900 text-white dark:bg-gray-200 dark:border-gray-200 dark:text-gray-900'
+					? 'bg-brand border-gray-900 text-brand-foreground dark:bg-brand dark:border-gray-200 dark:text-brand-foreground'
 					: 'border-gray-300 dark:border-gray-600'}"
 				on:click|stopPropagation={(event) => onSelect(entry, event, entryPath, rowIndex)}
 			>
@@ -300,7 +300,7 @@
 				<input
 					bind:this={renameInput}
 					bind:value={renameValue}
-					class="flex-1 text-xs bg-transparent border border-gray-100 dark:border-white/[0.06] rounded px-1.5 py-0.5 outline-none focus:border-blue-400 dark:focus:border-blue-500 text-gray-800 dark:text-gray-200 min-w-0"
+					class="flex-1 text-xs bg-transparent border border-gray-100 dark:border-white/[0.06] rounded px-1.5 py-0.5 outline-none focus:border-brand-focus dark:focus:border-brand-focus text-gray-800 dark:text-gray-200 min-w-0"
 					on:keydown={(e) => {
 						if (e.key === 'Enter') {
 							e.preventDefault();

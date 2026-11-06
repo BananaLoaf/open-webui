@@ -162,7 +162,7 @@
 				<button
 					class="w-6 h-6 flex items-center justify-center rounded-full transition
 						{day.getMonth() !== miniMonth ? 'text-gray-300 dark:text-gray-600' : ''}
-						{isToday(day) ? 'bg-blue-500 text-white' : ''}
+						{isToday(day) ? 'bg-brand text-brand-foreground' : ''}
 						{day.toDateString() === currentDate.toDateString() && !isToday(day)
 						? 'bg-gray-200 dark:bg-gray-700'
 						: ''}

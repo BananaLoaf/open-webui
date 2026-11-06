@@ -1089,7 +1089,7 @@
 															<span class="font-medium">{field.key}</span>
 															<span class="text-gray-400 dark:text-gray-600">{field.type}</span>
 															{#if field.required}
-																<span class="text-amber-600 dark:text-amber-400">required</span>
+																<span class="text-brand-text dark:text-brand-text">required</span>
 															{/if}
 														</div>
 													{/each}
@@ -1111,7 +1111,7 @@
 
 											{#if chatVariablesPreview.warnings.length > 0}
 												<div
-													class="mt-2 flex flex-col gap-1 text-xs text-amber-600 dark:text-amber-400"
+													class="mt-2 flex flex-col gap-1 text-xs text-brand-text dark:text-brand-text"
 												>
 													{#each chatVariablesPreview.warnings as warning}
 														<div>{warning}</div>

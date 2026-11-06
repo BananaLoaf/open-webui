@@ -289,7 +289,7 @@
 						{/if}
 
 						<button
-							class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-950 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full flex flex-row space-x-1 items-center {loading
+							class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-gray-950 text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full flex flex-row space-x-1 items-center {loading
 								? ' cursor-not-allowed'
 								: ''}"
 							type="submit"

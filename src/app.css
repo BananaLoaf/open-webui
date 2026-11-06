@@ -49,7 +49,7 @@ code {
 }
 
 .editor-selection {
-	background: rgba(180, 213, 255, 0.5);
+	background: var(--ow-selection);
 	border-radius: 2px;
 }
 
@@ -369,15 +369,27 @@ input[type='number'] {
 }
 
 .cm-gutters {
-	@apply !bg-white dark:!bg-black !border-none;
+	background-color: var(--ow-panel) !important;
+	@apply !border-none;
 }
 
 .cm-editor {
-	@apply bg-white dark:bg-black;
+	background-color: var(--ow-panel) !important;
+}
+
+.cm-editor .cm-cursor {
+	border-left-color: var(--ow-focus) !important;
+}
+
+.cm-editor .cm-selectionBackground {
+	background-color: var(--ow-selection) !important;
 }
 
 .tippy-box[data-theme~='dark'] {
-	@apply rounded-lg bg-gray-950 text-xs border border-gray-900 shadow-xl;
+	@apply rounded-lg text-xs border shadow-xl;
+	background: var(--ow-popover);
+	color: var(--ow-text);
+	border-color: var(--ow-border);
 }
 
 .password {
@@ -404,7 +416,7 @@ input[type='number'] {
 }
 
 .bg-gray-950-90 {
-	background-color: rgba(var(--color-gray-950, #0d0d0d), 0.9);
+	background-color: color-mix(in srgb, var(--color-gray-950) 90%, transparent);
 }
 
 .ProseMirror {
@@ -417,12 +429,12 @@ input[type='number'] {
 
 :focus-visible:not(.ProseMirror):not([contenteditable='true']):not(input):not(textarea),
 .focus-ring:focus-visible {
-	outline: 2px solid theme(--color-blue-500);
+	outline: 2px solid var(--ow-focus);
 	outline-offset: -2px;
 }
 
 html.high-contrast :is(input, textarea, [contenteditable='true'], .ProseMirror):focus-visible {
-	outline: 2px solid theme(--color-blue-500);
+	outline: 2px solid var(--ow-focus);
 	outline-offset: -2px;
 }
 
@@ -512,7 +524,7 @@ html.high-contrast.dark .ProseMirror p.is-editor-empty:first-child::before {
 	border-radius: 0.4rem;
 	box-decoration-break: clone;
 	padding: 0.1rem 0.3rem;
-	@apply text-sky-800 dark:text-sky-200 bg-sky-300/15 dark:bg-sky-500/15;
+	@apply text-brand-text bg-brand-soft;
 }
 
 .mention::after {
@@ -523,7 +535,7 @@ html.high-contrast.dark .ProseMirror p.is-editor-empty:first-child::before {
 	border-radius: 0.4rem;
 	box-decoration-break: clone;
 	padding: 0.1rem 0.3rem;
-	@apply text-sky-800 dark:text-sky-200 bg-sky-300/15 dark:bg-sky-500/15;
+	@apply text-brand-text bg-brand-soft;
 }
 
 .tiptap .suggestion::after {
@@ -739,7 +751,7 @@ html.high-contrast.dark .ProseMirror p.is-editor-empty:first-child::before {
 	margin-right: -1px;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
-	border-color: orange;
+	border-color: var(--ow-accent);
 	word-break: normal;
 	pointer-events: none;
 }
@@ -749,22 +761,22 @@ html.high-contrast.dark .ProseMirror p.is-editor-empty:first-child::before {
 	top: -1.05em;
 	left: -1px;
 	font-size: 0.8125rem;
-	background-color: rgb(250, 129, 0);
+	background-color: var(--ow-accent);
 	user-select: none;
-	color: white;
+	color: var(--ow-accent-foreground);
 	padding-left: 0.125rem;
 	padding-right: 0.125rem;
 	white-space: nowrap;
 }
 
 body {
-	background: #fff;
-	color: #000;
+	background: var(--ow-canvas);
+	color: var(--ow-text);
 }
 
 .dark body {
-	background: #171717;
-	color: #eee;
+	background: var(--ow-canvas);
+	color: var(--ow-text);
 }
 
 /* Position the handle relative to each LI */

@@ -363,7 +363,7 @@ class Tools:
 				</div>
 
 				<button
-					class="flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-gray-900 px-2.5 text-xs text-white transition hover:bg-black disabled:opacity-60 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+					class="flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-brand px-2.5 text-xs text-brand-foreground transition hover:bg-brand-hover disabled:opacity-60 dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover"
 					type="submit"
 					disabled={loading}
 				>
@@ -384,7 +384,7 @@ class Tools:
 	}}
 >
 	<div class="text-sm text-gray-500">
-		<div class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-lg px-4 py-3">
+		<div class=" bg-brand-soft text-brand-text dark:text-brand-text rounded-lg px-4 py-3">
 			<div>{$i18n.t('Please carefully review the following warnings:')}</div>
 
 			<ul class=" mt-1 list-disc pl-4 text-xs">

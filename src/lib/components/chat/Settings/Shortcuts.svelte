@@ -238,7 +238,7 @@
 
 									{#if conflict}
 										<span
-											class="text-[0.5625rem] text-amber-500"
+											class="text-[0.5625rem] text-brand-text"
 											title={$i18n.t('Also bound to {{action}}', {
 												action: shortcuts[conflict]?.name($i18n.t) ?? conflict
 											})}>!</span

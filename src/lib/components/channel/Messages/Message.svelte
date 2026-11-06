@@ -199,7 +199,7 @@
 						$user?.id
 							? 'border-l-4 border-orange-500 bg-orange-100/10 dark:bg-orange-100/5 pl-4'
 							: ''
-					} ${message?.is_pinned ? 'bg-yellow-100/20 dark:bg-yellow-100/5' : ''}`} {showUserProfile
+					} ${message?.is_pinned ? 'bg-brand-soft dark:bg-brand-soft' : ''}`} {showUserProfile
 				? 'pt-1.5 pb-0.5'
 				: ''}"
 			style="transform: translateX({swipeOffsetX}px); {swipeOffsetX > 0
@@ -306,7 +306,7 @@
 			{#if message?.is_pinned}
 				<div class="flex {showUserProfile ? 'mb-0.5' : 'mt-0.5'}">
 					<div class="ml-8.5 flex items-center gap-1 px-1 rounded-full text-xs">
-						<Pin className="size-3 text-yellow-500 dark:text-yellow-300" />
+						<Pin className="size-3 text-brand-text dark:text-brand-text" />
 						<span class="text-gray-500">{$i18n.t('Pinned')}</span>
 					</div>
 				</div>
@@ -599,7 +599,7 @@
 												class="flex items-center gap-1.5 transition rounded-xl px-2 py-1 cursor-pointer {reaction.users
 													.map((u) => u.id)
 													.includes($user?.id)
-													? ' bg-blue-300/10 outline outline-blue-500/50 outline-1'
+													? ' bg-brand-soft outline outline-brand-focus/50 outline-1'
 													: 'bg-gray-300/10 dark:bg-gray-500/10 hover:outline hover:outline-gray-700/30 dark:hover:outline-gray-300/30 hover:outline-1'}"
 												on:click={() => {
 													if (onReaction) {
@@ -712,8 +712,8 @@
 	}
 
 	.swipe-reply-icon--active {
-		background-color: rgba(59, 130, 246, 0.2);
-		color: rgb(59, 130, 246);
+		background-color: var(--ow-tool-bg);
+		color: var(--ow-tool-text);
 	}
 
 	:global(.dark) .swipe-reply-icon {
@@ -722,7 +722,7 @@
 	}
 
 	:global(.dark) .swipe-reply-icon--active {
-		background-color: rgba(96, 165, 250, 0.2);
-		color: rgb(96, 165, 250);
+		background-color: var(--ow-tool-bg);
+		color: var(--ow-tool-text);
 	}
 </style>

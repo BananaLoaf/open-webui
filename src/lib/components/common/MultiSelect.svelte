@@ -117,7 +117,7 @@
 						class="size-3.5 shrink-0 rounded-sm flex items-center justify-center outline -outline-offset-1 outline-[1.5px] {selectedValues.includes(
 							item.value
 						)
-							? 'bg-black outline-black text-white'
+							? 'bg-brand outline-brand-focus text-brand-foreground'
 							: 'outline-gray-200 dark:outline-gray-600'}"
 					>
 						{#if selectedValues.includes(item.value)}

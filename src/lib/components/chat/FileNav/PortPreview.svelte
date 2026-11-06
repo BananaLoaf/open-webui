@@ -203,7 +203,7 @@
 			<input
 				type="text"
 				bind:value={urlInput}
-				class="w-full text-[0.6875rem] font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 outline-none focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400/20 text-gray-600 dark:text-gray-300 transition"
+				class="w-full text-[0.6875rem] font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 outline-none focus:border-brand-focus dark:focus:border-brand-focus focus:ring-1 focus:ring-brand-focus/20 text-gray-600 dark:text-gray-300 transition"
 				placeholder="localhost:{port}"
 			/>
 		</form>
@@ -254,7 +254,7 @@
 	<!-- Loading bar -->
 	{#if isLoading}
 		<div class="h-0.5 bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden">
-			<div class="h-full bg-blue-500 animate-loading-bar rounded-full" />
+			<div class="h-full bg-brand animate-loading-bar rounded-full" />
 		</div>
 	{/if}
 

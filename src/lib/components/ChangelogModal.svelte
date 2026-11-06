@@ -135,11 +135,11 @@
 									<div
 										class="mb-2 text-[0.6875rem] font-normal uppercase tracking-wide {section ===
 										'added'
-											? 'text-blue-600 dark:text-blue-300'
+											? 'text-brand-text dark:text-brand-text'
 											: section === 'fixed'
 												? 'text-green-600 dark:text-green-300'
 												: section === 'changed'
-													? 'text-yellow-700 dark:text-yellow-300'
+													? 'text-brand-text dark:text-brand-text'
 													: section === 'removed'
 														? 'text-red-600 dark:text-red-300'
 														: 'text-gray-500 dark:text-gray-400'}"

@@ -1016,7 +1016,7 @@
 							</div>
 
 							<button
-								class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 disabled:opacity-50 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full flex flex-row space-x-1 items-center"
+								class="px-3.5 py-1.5 text-sm font-medium bg-brand hover:bg-brand-hover disabled:opacity-50 text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full flex flex-row space-x-1 items-center"
 								type="submit"
 								disabled={loading || loadingPolicy || !!policyLoadError}
 							>

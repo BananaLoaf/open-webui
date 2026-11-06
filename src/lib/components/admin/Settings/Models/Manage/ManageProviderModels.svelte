@@ -51,7 +51,7 @@
 	let providerModels: ProviderModel[] = [];
 
 	const inputClass =
-		'h-7 w-full rounded-lg border border-gray-100/50 bg-gray-50/40 px-2.5 text-left text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 disabled:opacity-50 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500';
+		'h-7 w-full rounded-lg border border-gray-100/50 bg-gray-50/40 px-2.5 text-left text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus disabled:opacity-50 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus';
 	const iconButtonClass =
 		'inline-flex h-7 items-center justify-center rounded-lg border border-gray-100/50 bg-gray-50/40 px-2.5 text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:hover:bg-white/[0.06]';
 
@@ -82,7 +82,7 @@
 			return 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300';
 		}
 		if (status === 'loading' || status === 'downloading') {
-			return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300';
+			return 'bg-brand-soft text-brand-text dark:bg-brand-soft dark:text-brand-text';
 		}
 		return 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300';
 	};

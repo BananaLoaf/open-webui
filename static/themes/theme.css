@@ -1,0 +1,118 @@
+/* Accepted palette: Silver light / Balance dark. Canonical UI colour roles. */
+:root {
+	color-scheme: light;
+	--ow-canvas: #ffffff;
+	--ow-sidebar: #f3f3f3;
+	--ow-panel: #ffffff;
+	--ow-popover: #ffffff;
+	--ow-soft: #f0f0f0;
+	--ow-text: #21211f;
+	--ow-muted: #5f5f5f;
+	--ow-border: #dddddd;
+	--ow-control-border: #858585;
+	--ow-accent: #f7ce03;
+	--ow-accent-foreground: #21211f;
+	--ow-accent-hover: #e9c200;
+	--ow-accent-edge: #21211f;
+	--ow-selected: #f7ce03;
+	--ow-selected-text: #21211f;
+	--ow-focus: #21211f;
+	--ow-link: #21211f;
+	--ow-tool-bg: #f2f2f2;
+	--ow-tool-text: #21211f;
+	--ow-selection: #dddddd;
+	--ow-shadow: 0 12px 40px #02020014;
+	--color-gray-50: #f8f8f8;
+	--color-gray-100: #f3f3f3;
+	--color-gray-200: #e8e8e8;
+	--color-gray-300: #dddddd;
+	--color-gray-400: #858585;
+	--color-gray-500: #737373;
+	--color-gray-600: #5f5f5f;
+	--color-gray-700: #484848;
+	--color-gray-800: #353535;
+	--color-gray-850: #292929;
+	--color-gray-900: #21211f;
+	--color-gray-950: #020200;
+}
+html.dark {
+	color-scheme: dark;
+	--ow-canvas: #171715;
+	--ow-sidebar: #21211f;
+	--ow-panel: #292926;
+	--ow-popover: #30302c;
+	--ow-soft: #30302c;
+	--ow-text: #f5f5ef;
+	--ow-muted: #b8b8aa;
+	--ow-border: #494940;
+	--ow-control-border: #808074;
+	--ow-selected: #39351c;
+	--ow-selected-text: #f7ce03;
+	--ow-focus: #f7ce03;
+	--ow-link: #f7ce03;
+	--ow-tool-bg: #35321c;
+	--ow-tool-text: #f7ce03;
+	--ow-accent-edge: #f7ce03;
+	--ow-selection: #494940;
+	--ow-shadow: 0 12px 40px #02020055;
+	--color-gray-50: #f5f5ef;
+	--color-gray-100: #e9e9e2;
+	--color-gray-200: #d5d5cb;
+	--color-gray-300: #b8b8aa;
+	--color-gray-400: #a0a094;
+	--color-gray-500: #919185;
+	--color-gray-600: #808074;
+	--color-gray-700: #494940;
+	--color-gray-800: #30302c;
+	--color-gray-850: #292926;
+	--color-gray-900: #21211f;
+	--color-gray-950: #171715;
+}
+html.oled-dark {
+	--ow-canvas: #020200;
+	--ow-sidebar: #10100e;
+	--ow-panel: #151513;
+	--ow-popover: #21211f;
+	--ow-soft: #21211f;
+	--color-gray-800: #21211f;
+	--color-gray-850: #151513;
+	--color-gray-900: #10100e;
+	--color-gray-950: #020200;
+}
+/* Her retains its special interactions while sharing the accepted light palette. */
+html, body { background-color: var(--ow-canvas); color: var(--ow-text); }
+html body { background-color: var(--ow-canvas); color: var(--ow-text); }
+#sidebar { background-color: var(--ow-sidebar); }
+.app-modal-surface, .app-dropdown-menu, .app-select-surface {
+	background-color: var(--ow-popover);
+	color: var(--ow-text);
+	border-color: var(--ow-border);
+}
+#message-input-container {
+	background-color: var(--ow-panel);
+	border-color: var(--ow-control-border);
+}
+button.bg-brand, .lab-primary {
+	box-shadow: inset 0 0 0 1px var(--ow-accent-edge);
+}
+:is(input, textarea, select).border {
+	border-color: var(--ow-control-border);
+}
+:is(input, textarea, select).border:focus {
+	border-color: var(--ow-focus);
+}
+.tippy-box {
+	background-color: var(--ow-popover);
+	color: var(--ow-text);
+	border: 1px solid var(--ow-border);
+	box-shadow: var(--ow-shadow);
+}
+.tippy-arrow { color: var(--ow-popover); }
+[data-sonner-toaster] {
+	--normal-bg: var(--ow-popover);
+	--normal-text: var(--ow-text);
+	--normal-border: var(--ow-border);
+}
+input::placeholder, textarea::placeholder { color: var(--ow-muted); }
+input[type=range] { accent-color: var(--ow-accent); }
+::selection { background: var(--ow-selection); color: var(--ow-text); }

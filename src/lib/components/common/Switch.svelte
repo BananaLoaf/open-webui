@@ -39,14 +39,14 @@
 			class="focus-ring relative h-4 min-h-4 w-7 shrink-0 cursor-pointer rounded-full mx-[0.0625rem] transition-colors duration-150 disabled:cursor-not-allowed {($settings?.highContrastMode ??
 			false)
 				? 'focus:outline focus:outline-2 focus:outline-gray-800! focus:dark:outline-gray-200!'
-				: ''} {state ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-gray-700'}"
+				: ''} {state ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-700'}"
 			onCheckedChange={async () => {
 				await tick();
 				dispatch('change', state);
 			}}
 		>
 			<Switch.Thumb
-				class="pointer-events-none absolute top-[0.125rem] block h-3 w-3 shrink-0 rounded-full transition-all duration-150 data-[state=checked]:left-[0.875rem] data-[state=checked]:bg-white data-[state=checked]:dark:bg-black data-[state=unchecked]:left-[0.125rem] data-[state=unchecked]:bg-white data-[state=unchecked]:dark:bg-gray-500"
+				class="pointer-events-none absolute top-[0.125rem] block h-3 w-3 shrink-0 rounded-full transition-all duration-150 data-[state=checked]:left-[0.875rem] data-[state=checked]:bg-brand-foreground data-[state=unchecked]:left-[0.125rem] data-[state=unchecked]:bg-white data-[state=unchecked]:dark:bg-gray-500"
 			/>
 		</Switch.Root>
 	</div>

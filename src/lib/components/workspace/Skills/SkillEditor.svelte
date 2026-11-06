@@ -211,7 +211,7 @@
 		{#if !disabled}
 			<div class="flex shrink-0 justify-end py-2">
 				<button
-					class="flex h-7 items-center gap-1.5 rounded-lg bg-gray-900 px-2.5 text-xs text-white transition hover:bg-black disabled:opacity-60 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+					class="flex h-7 items-center gap-1.5 rounded-lg bg-brand px-2.5 text-xs text-brand-foreground transition hover:bg-brand-hover disabled:opacity-60 dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover"
 					type="submit"
 					disabled={loading}
 				>

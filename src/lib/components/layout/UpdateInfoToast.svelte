@@ -28,7 +28,7 @@
 
 	<div class=" shrink-0 pr-1">
 		<button
-			class=" hover:text-blue-900 dark:hover:text-blue-300 transition"
+			class=" hover:text-brand-text dark:hover:text-brand-text transition"
 			on:click={() => {
 				dispatch('close');
 			}}

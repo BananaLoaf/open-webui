@@ -2,6 +2,21 @@
 
 @config '../tailwind.config.js';
 
+@theme inline {
+	--color-brand: var(--ow-accent);
+	--color-brand-foreground: var(--ow-accent-foreground);
+	--color-brand-hover: var(--ow-accent-hover);
+	--color-brand-text: var(--ow-link);
+	--color-brand-soft: var(--ow-tool-bg);
+	--color-brand-selected: var(--ow-selected);
+	--color-brand-selected-text: var(--ow-selected-text);
+	--color-brand-focus: var(--ow-focus);
+	--color-panel: var(--ow-panel);
+	--color-canvas: var(--ow-canvas);
+	--color-content: var(--ow-text);
+	--color-popover: var(--ow-popover);
+}
+
 @theme {
 	--font-sans:
 		var(--app-font-family, -apple-system), BlinkMacSystemFont, 'Inter', 'Vazirmatn', ui-sans-serif,
@@ -68,14 +83,14 @@
 	}
 
 	input[type='checkbox'] {
-		@apply appearance-none size-3.5 align-middle bg-white border border-gray-300 rounded transition cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 self-center;
+		@apply appearance-none size-3.5 align-middle bg-white border border-gray-300 rounded transition cursor-pointer focus:ring-2 focus:ring-brand-focus focus:outline-none dark:bg-gray-800 dark:border-gray-600 self-center;
 		/* Center the custom mark */
 		display: inline-block;
 		position: relative;
 	}
 
 	input[type='checkbox']:checked {
-		@apply bg-blue-600 border-blue-600;
+		@apply bg-brand border-brand-focus;
 	}
 
 	input[type='checkbox']:after {
@@ -91,7 +106,7 @@
 		left: 0;
 		pointer-events: none;
 		/* SVG checkmark as background image */
-		background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 8l3 3l5-5"/></svg>')
+		background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" fill="none" stroke="%2321211f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 8l3 3l5-5"/></svg>')
 			center/80% no-repeat;
 	}
 

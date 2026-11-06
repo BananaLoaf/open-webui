@@ -40,7 +40,7 @@
 	// Audio speed control
 	let playbackRate = 1;
 	const inputClass =
-		'h-7 w-full rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-blue-500';
+		'h-7 w-full rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-brand-focus';
 
 	const getVoices = async () => {
 		if (TTSEngine === 'browser-kokoro') {
@@ -217,7 +217,7 @@
 							bind:value={STTLanguage}
 							aria-label={$i18n.t('Speech-to-Text Language')}
 							placeholder={$i18n.t('e.g. en')}
-							class="h-7 w-24 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-right text-xs text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-blue-500"
+							class="h-7 w-24 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-right text-xs text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-brand-focus"
 						/>
 					</Tooltip>
 				</UserSettingRow>
@@ -299,7 +299,7 @@
 						step="0.01"
 						bind:value={playbackRate}
 						aria-label={$i18n.t('settings.personal.audio.speechPlaybackSpeed.label')}
-						class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-right text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+						class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-right text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 					/>
 					x
 				</div>
@@ -400,7 +400,7 @@
 
 	<div class="shrink-0 flex justify-end text-sm font-normal">
 		<button
-			class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
+			class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full"
 			type="submit"
 		>
 			{$i18n.t('Save')}

@@ -1897,7 +1897,7 @@
 								? 'border-dashed border-gray-100 dark:border-gray-800 hover:border-gray-200 focus-within:border-gray-200 hover:dark:border-gray-700 focus-within:dark:border-gray-700'
 								: ' border-gray-100/30 dark:border-gray-850/30 hover:border-gray-200 focus-within:border-gray-100 hover:dark:border-gray-800 focus-within:dark:border-gray-800'} {($settings?.highContrastMode ??
 							false)
-								? 'focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-500 [&_.ProseMirror:focus-visible]:outline-none!'
+								? 'focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-brand-focus [&_.ProseMirror:focus-visible]:outline-none!'
 								: ''}  transition px-0.5 bg-white/5 dark:bg-gray-500/5 backdrop-blur-sm dark:text-gray-100"
 							dir={$settings?.chatDirection ?? 'auto'}
 						>
@@ -1960,7 +1960,7 @@
 																viewBox="0 0 24 24"
 																fill="currentColor"
 																aria-hidden="true"
-																class="size-4 fill-yellow-300"
+																class="size-4 fill-brand"
 															>
 																<path
 																	fill-rule="evenodd"
@@ -2441,7 +2441,7 @@
 															class="group p-[0.375rem] flex gap-1.5 items-center text-sm rounded-full transition-colors duration-300 focus:outline-hidden max-w-full overflow-hidden {selectedFilterIds.includes(
 																filterId
 															)
-																? 'text-sky-500 dark:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-400/10 dark:hover:bg-sky-600/10 border border-sky-200/40 dark:border-sky-500/20'
+																? 'text-brand-text dark:text-brand-text bg-brand-soft hover:bg-brand-soft dark:bg-brand-soft dark:hover:bg-brand-soft border border-brand-focus/40 dark:border-brand-focus/20'
 																: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 '} capitalize"
 														>
 															{#if filter?.icon}
@@ -2488,7 +2488,7 @@
 														type="button"
 														class="group p-[0.375rem] flex gap-1.5 items-center text-sm rounded-full transition-colors duration-300 focus:outline-hidden max-w-full overflow-hidden {webSearchEnabled ||
 														($settings?.webSearch ?? false) === 'always'
-															? ' text-sky-500 dark:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-400/10 dark:hover:bg-sky-600/10 border border-sky-200/40 dark:border-sky-500/20'
+															? ' text-brand-text dark:text-brand-text bg-brand-soft hover:bg-brand-soft dark:bg-brand-soft dark:hover:bg-brand-soft border border-brand-focus/40 dark:border-brand-focus/20'
 															: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 '}"
 													>
 														<GlobeAlt className="size-4" strokeWidth="1.75" />
@@ -2506,7 +2506,7 @@
 															(imageGenerationEnabled = !imageGenerationEnabled)}
 														type="button"
 														class="group p-[0.375rem] flex gap-1.5 items-center text-sm rounded-full transition-colors duration-300 focus:outline-hidden max-w-full overflow-hidden {imageGenerationEnabled
-															? ' text-sky-500 dark:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-400/10 dark:hover:bg-sky-700/10 border border-sky-200/40 dark:border-sky-500/20'
+															? ' text-brand-text dark:text-brand-text bg-brand-soft hover:bg-brand-soft dark:bg-brand-soft dark:hover:bg-brand-soft border border-brand-focus/40 dark:border-brand-focus/20'
 															: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 '}"
 													>
 														<Photo className="size-4" strokeWidth="1.75" />
@@ -2528,7 +2528,7 @@
 															(codeInterpreterEnabled = !codeInterpreterEnabled)}
 														type="button"
 														class=" group p-[0.375rem] flex gap-1.5 items-center text-sm transition-colors duration-300 max-w-full overflow-hidden {codeInterpreterEnabled
-															? ' text-sky-500 dark:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-400/10 dark:hover:bg-sky-700/10 border border-sky-200/40 dark:border-sky-500/20'
+															? ' text-brand-text dark:text-brand-text bg-brand-soft hover:bg-brand-soft dark:bg-brand-soft dark:hover:bg-brand-soft border border-brand-focus/40 dark:border-brand-focus/20'
 															: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 '} {($settings?.highContrastMode ??
 														false)
 															? 'm-1'
@@ -2673,7 +2673,7 @@
 												<!-- {$i18n.t('Call')} -->
 												<Tooltip content={$i18n.t('Voice mode')}>
 													<button
-														class=" bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full p-[0.3125rem] self-center"
+														class=" bg-brand text-brand-foreground hover:bg-brand-hover dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full p-[0.3125rem] self-center"
 														type="button"
 														on:click={async () => {
 															if (selectedModels.length > 1) {
@@ -2741,7 +2741,7 @@
 													<button
 														id="send-message-button"
 														class="{!(prompt === '' && files.length === 0) || uploadPending
-															? 'bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100 '
+															? 'bg-brand text-brand-foreground hover:bg-brand-hover dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover '
 															: 'text-white bg-gray-200 dark:text-gray-900 dark:bg-gray-700 disabled'} transition rounded-full p-[0.3125rem] self-center"
 														type="submit"
 														disabled={(prompt === '' && files.length === 0) || uploadPending}

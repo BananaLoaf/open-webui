@@ -673,7 +673,7 @@ async def speech(request: Request, user=Depends(get_verified_user)):
             # https://docs.openwebui.com/license.
             raise HTTPException(
                 status_code=r.status if r else 500,
-                detail=detail if detail else 'Open WebUI: Server Connection Error',
+                detail=detail if detail else 'ИННОМАЙТ: Server Connection Error',
             )
 
     except ValueError:
@@ -936,7 +936,7 @@ async def get_models(request: Request, url_idx: int | None = None, user=Depends(
                 # LICENSE covers this Open WebUI error identifier.
                 # Do not alter, remove, obscure, or replace it except as LICENSE permits:
                 # https://docs.openwebui.com/license.
-                raise HTTPException(status_code=500, detail='Open WebUI: Server Connection Error')
+                raise HTTPException(status_code=500, detail='ИННОМАЙТ: Server Connection Error')
             except Exception as e:
                 log.exception(f'Unexpected error: {e}')
                 error_detail = f'Unexpected error: {str(e)}'
@@ -1898,7 +1898,7 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
         # https://docs.openwebui.com/license.
         raise HTTPException(
             status_code=r.status if r else 500,
-            detail='Open WebUI: Server Connection Error',
+            detail='ИННОМАЙТ: Server Connection Error',
         )
     finally:
         if not streaming:

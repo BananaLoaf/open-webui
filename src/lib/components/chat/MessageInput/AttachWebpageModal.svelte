@@ -15,7 +15,7 @@
 	let url = '';
 
 	const highContrastInputClass =
-		'rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 py-1.5 text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-blue-500';
+		'rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 py-1.5 text-gray-700 outline-hidden transition-colors placeholder:text-gray-300 focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:placeholder:text-gray-700 dark:focus:border-brand-focus';
 
 	const submitHandler = () => {
 		let urls = url
@@ -82,7 +82,7 @@
 
 				<div class="flex justify-end gap-2 pt-3">
 					<button
-						class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 transition rounded-full"
+						class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-gray-800 text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-gray-200 transition rounded-full"
 						type="submit"
 					>
 						{$i18n.t('Add')}

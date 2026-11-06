@@ -1101,7 +1101,7 @@
 														id="send-message-button"
 														aria-label={$i18n.t('Send message')}
 														class="{content !== '' || files.length !== 0
-															? 'bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100 '
+															? 'bg-brand text-brand-foreground hover:bg-brand-hover dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover '
 															: 'text-white bg-gray-200 dark:text-gray-900 dark:bg-gray-700 disabled'} transition rounded-full p-[0.3125rem] self-center"
 														type="submit"
 														disabled={content === '' && files.length === 0}

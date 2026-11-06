@@ -139,12 +139,12 @@
 	$: chatItemClass = ` w-full flex justify-between rounded-xl px-2 py-1.5 ${
 		id === $chatId || confirmEdit
 			? ($settings?.highContrastMode ?? false)
-				? 'bg-black/[0.035] dark:bg-white/[0.06] selected'
-				: 'bg-black/[0.035] dark:bg-white/[0.045] selected'
+				? 'bg-brand-selected text-brand-selected-text selected'
+				: 'bg-brand-selected text-brand-selected-text selected'
 			: selected
 				? ($settings?.highContrastMode ?? false)
-					? 'bg-black/[0.035] dark:bg-white/[0.055] selected'
-					: 'bg-black/[0.035] dark:bg-white/[0.045] selected'
+					? 'bg-brand-selected text-brand-selected-text selected'
+					: 'bg-brand-selected text-brand-selected-text selected'
 				: $mobile
 					? ''
 					: ' hover:bg-gray-100 dark:hover:bg-gray-900 group-hover:bg-gray-100 dark:group-hover:bg-gray-900'
@@ -539,7 +539,7 @@
 	<div class="flex self-center flex-1 w-full min-w-0">
 		{#if unread}
 			<div class="shrink-0 self-center pr-2.5 flex transition-opacity duration-300">
-				<div class="size-1.5 bg-sky-500 rounded-full"></div>
+				<div class="size-1.5 bg-brand rounded-full"></div>
 			</div>
 		{/if}
 		<div
@@ -611,12 +611,12 @@
 			id="sidebar-chat-item"
 			class=" w-full flex justify-between rounded-xl px-2 py-1.5 {id === $chatId || confirmEdit
 				? ($settings?.highContrastMode ?? false)
-					? 'bg-black/[0.035] dark:bg-white/[0.06] selected'
-					: 'bg-black/[0.035] dark:bg-white/[0.045] selected'
+					? 'bg-brand-selected text-brand-selected-text selected'
+					: 'bg-brand-selected text-brand-selected-text selected'
 				: selected
 					? ($settings?.highContrastMode ?? false)
-						? 'bg-black/[0.035] dark:bg-white/[0.055] selected'
-						: 'bg-black/[0.035] dark:bg-white/[0.045] selected'
+						? 'bg-brand-selected text-brand-selected-text selected'
+						: 'bg-brand-selected text-brand-selected-text selected'
 					: 'hover:bg-gray-100 dark:hover:bg-gray-900 group-hover:bg-gray-100 dark:group-hover:bg-gray-900'}  whitespace-nowrap text-ellipsis relative transition {generating
 				? 'cursor-not-allowed'
 				: ''}"

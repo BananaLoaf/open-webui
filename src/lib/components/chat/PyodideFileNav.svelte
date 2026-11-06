@@ -461,11 +461,11 @@
 		{#if !loading && !error && !selectedFile}
 			{#if creatingFolder}
 				<div class="flex items-center gap-2 px-3 py-1.5">
-					<Folder className="size-4 shrink-0 text-blue-400 dark:text-blue-300" />
+					<Folder className="size-4 shrink-0 text-brand-text dark:text-brand-text" />
 					<input
 						bind:this={newFolderInput}
 						bind:value={newFolderName}
-						class="flex-1 text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 outline-none focus:border-blue-400 dark:focus:border-blue-500"
+						class="flex-1 text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 outline-none focus:border-brand-focus dark:focus:border-brand-focus"
 						placeholder={$i18n.t('Folder name')}
 						on:keydown={(e) => {
 							if (e.key === 'Enter') submitNewFolder();
@@ -484,7 +484,7 @@
 					<input
 						bind:this={newFileInput}
 						bind:value={newFileName}
-						class="flex-1 text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 outline-none focus:border-blue-400 dark:focus:border-blue-500"
+						class="flex-1 text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 outline-none focus:border-brand-focus dark:focus:border-brand-focus"
 						placeholder={$i18n.t('File name')}
 						on:keydown={(e) => {
 							if (e.key === 'Enter') submitNewFile();

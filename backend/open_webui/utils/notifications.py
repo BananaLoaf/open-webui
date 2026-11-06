@@ -357,7 +357,7 @@ async def test_target(user_id: str, target_id: str, app_name: str = 'Open WebUI'
         # LICENSE covers this Open WebUI notification copy.
         # Do not alter, remove, obscure, or replace it except as LICENSE permits:
         # https://docs.openwebui.com/license.
-        'This is a test notification from Open WebUI.',
+        'This is a test notification from ИННОМАЙТ.',
         {'action': 'test', 'user_id': user_id},
         'Test notification',
     )

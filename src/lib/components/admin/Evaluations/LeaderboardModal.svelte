@@ -125,7 +125,7 @@
 
 			<div class="flex justify-end pt-2">
 				<button
-					class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
+					class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full"
 					type="button"
 					on:click={close}
 				>

@@ -57,14 +57,14 @@
 							<a
 								href={manifest.funding_url}
 								target="_blank"
-								class="underline text-blue-400 hover:text-blue-300">{manifest.funding_url}</a
+								class="underline text-brand-text hover:text-brand-text">{manifest.funding_url}</a
 							>
 						</div>
 					</div>
 
 					<div class="flex justify-end pt-3 text-sm font-normal">
 						<button
-							class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
+							class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full"
 							type="submit"
 						>
 							{$i18n.t('Done')}

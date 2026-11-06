@@ -89,7 +89,7 @@
 								type="number"
 								bind:value={maxConcurrent}
 								min="-1"
-								class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+								class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 							/>
 							<span class="text-[0.6875rem] text-gray-400 dark:text-gray-600">
 								{$i18n.t('simultaneous sub-agents')}
@@ -120,7 +120,7 @@
 									type="number"
 									bind:value={maxAsync}
 									min="-1"
-									class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+									class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 								/>
 								<span class="text-[0.6875rem] text-gray-400 dark:text-gray-600">
 									{$i18n.t('background sub-agents')}
@@ -140,7 +140,7 @@
 								bind:value={maxIterations}
 								min="1"
 								max="100"
-								class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+								class="h-7 w-16 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 							/>
 							<span class="text-[0.6875rem] text-gray-400 dark:text-gray-600">
 								{$i18n.t('tool loops per sub-agent')}
@@ -160,7 +160,7 @@
 								min="1000"
 								max="100000"
 								step="1000"
-								class="h-7 w-20 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+								class="h-7 w-20 rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 							/>
 							<span class="text-[0.6875rem] text-gray-400 dark:text-gray-600">chars</span>
 						</div>
@@ -175,7 +175,7 @@
 							bind:value={systemPrompt}
 							rows="4"
 							placeholder={$i18n.t('You are a sub-agent...')}
-							class="mt-1 w-full resize-y rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 py-1.5 font-mono text-xs text-gray-700 outline-hidden transition-colors focus:border-blue-400 dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-blue-500"
+							class="mt-1 w-full resize-y rounded-lg border border-gray-100/50 bg-gray-50/40 px-2 py-1.5 font-mono text-xs text-gray-700 outline-hidden transition-colors focus:border-brand-focus dark:border-white/[0.04] dark:bg-white/[0.03] dark:text-gray-300 dark:focus:border-brand-focus"
 						></textarea>
 						<p class="mt-0.5 text-[0.6875rem] text-gray-400 dark:text-gray-600">
 							{$i18n.t('settings.admin.subagents.systemPrompt.description')}
@@ -189,7 +189,7 @@
 	{#if !loading}
 		<div class="flex justify-end pt-6 text-sm font-normal">
 			<button
-				class="rounded-full bg-black px-3.5 py-1.5 text-sm font-normal text-white transition hover:bg-gray-900 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+				class="rounded-full bg-black px-3.5 py-1.5 text-sm font-normal text-brand-foreground transition hover:bg-gray-900 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-100"
 				type="submit"
 				disabled={saving}
 			>

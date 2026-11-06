@@ -175,7 +175,7 @@
 						<div class="flex justify-start px-0.5 mb-0.5">
 							<span
 								class="text-xs w-6 h-6 flex items-center justify-center rounded-full
-								{isToday(day) ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400'}"
+								{isToday(day) ? 'bg-brand text-brand-foreground' : 'text-gray-500 dark:text-gray-400'}"
 							>
 								{day.getDate()}
 							</span>
@@ -228,7 +228,7 @@
 										class="text-sm mt-0.5 w-7 h-7 flex items-center justify-center mx-auto rounded-full {isToday(
 											day
 										)
-											? 'bg-blue-500 text-white'
+											? 'bg-brand text-brand-foreground'
 											: ''}"
 									>
 										{day.getDate()}

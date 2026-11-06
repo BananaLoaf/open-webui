@@ -731,7 +731,7 @@
 
 											{#if !oauthClientInfo}
 												<div
-													class="text-xs font-normal px-1.5 rounded-md bg-yellow-500/20 text-yellow-700 dark:text-yellow-200"
+													class="text-xs font-normal px-1.5 rounded-md bg-brand-soft text-brand-text dark:text-brand-text"
 												>
 													{$i18n.t('Not Registered')}
 												</div>
@@ -1034,7 +1034,7 @@
 
 					{#if type === 'mcp'}
 						<div
-							class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-2xl text-xs px-4 py-3 mb-2 mt-1"
+							class=" bg-brand-soft text-brand-text dark:text-brand-text rounded-2xl text-xs px-4 py-3 mb-2 mt-1"
 						>
 							<span class="font-normal">
 								{$i18n.t('Warning')}:
@@ -1068,7 +1068,7 @@
 						</div>
 
 						<button
-							class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full flex items-center gap-2 whitespace-nowrap {loading
+							class="px-3.5 py-1.5 text-sm font-medium bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full flex items-center gap-2 whitespace-nowrap {loading
 								? ' cursor-not-allowed'
 								: ''}"
 							type="submit"

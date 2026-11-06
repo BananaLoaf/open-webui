@@ -51,7 +51,7 @@
 	<div bind:this={list} class="flex flex-col gap-1.5">
 		{#each entries as entry, index (entry)}
 			<div
-				class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_1.5rem] items-center gap-2 rounded-lg border border-gray-100/40 px-2 py-1 transition focus-within:border-blue-400 dark:border-gray-850/50 dark:focus-within:border-blue-500"
+				class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_1.5rem] items-center gap-2 rounded-lg border border-gray-100/40 px-2 py-1 transition focus-within:border-brand-focus dark:border-gray-850/50 dark:focus-within:border-brand-focus"
 			>
 				<textarea
 					rows="1"

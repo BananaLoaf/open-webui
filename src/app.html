@@ -35,6 +35,8 @@
 		<meta name="theme-color" content="#171717" />
 		<meta name="robots" content="noindex,nofollow" />
 
+		<link rel="stylesheet" href="/themes/theme.css" />
+		<script src="/themes/theme.js"></script>
 		<script src="/static/loader.js" defer crossorigin="use-credentials"></script>
 		<link rel="stylesheet" href="/static/custom.css" crossorigin="use-credentials" />
 
@@ -45,87 +47,10 @@
 		</script>
 
 		<script>
-			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
-			(() => {
-				const metaThemeColorTag = document.querySelector('meta[name="theme-color"]');
-				const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-				if (!localStorage?.theme) {
-					localStorage.theme = 'system';
-				}
-
-				if (localStorage.theme === 'system') {
-					document.documentElement.classList.add(prefersDarkTheme ? 'dark' : 'light');
-					metaThemeColorTag.setAttribute('content', prefersDarkTheme ? '#171717' : '#ffffff');
-				} else if (localStorage.theme === 'oled-dark') {
-					document.documentElement.style.setProperty('--color-gray-800', '#101010');
-					document.documentElement.style.setProperty('--color-gray-850', '#050505');
-					document.documentElement.style.setProperty('--color-gray-900', '#000000');
-					document.documentElement.style.setProperty('--color-gray-950', '#000000');
-					document.documentElement.classList.add('dark');
-					metaThemeColorTag.setAttribute('content', '#000000');
-				} else if (localStorage.theme === 'light') {
-					document.documentElement.classList.add('light');
-					metaThemeColorTag.setAttribute('content', '#ffffff');
-				} else if (localStorage.theme === 'her') {
-					document.documentElement.classList.add('her');
-					metaThemeColorTag.setAttribute('content', '#983724');
-				} else {
-					document.documentElement.classList.add('dark');
-					metaThemeColorTag.setAttribute('content', '#171717');
-				}
-
-				// LICENSE covers these Open WebUI splash logo assets.
-				// Do not alter, remove, obscure, or replace them except as LICENSE permits:
-				// https://docs.openwebui.com/license.
-				const preloadHref = document.documentElement.classList.contains('dark')
-					? '/static/splash-dark.png'
-					: '/static/splash.png';
-				const preload = document.createElement('link');
-				preload.rel = 'preload';
-				preload.as = 'image';
-				preload.href = preloadHref;
-				preload.setAttribute('fetchpriority', 'high');
-				document.head.appendChild(preload);
-
-				window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
-					if (localStorage.theme === 'system') {
-						if (e.matches) {
-							document.documentElement.classList.add('dark');
-							document.documentElement.classList.remove('light');
-							metaThemeColorTag.setAttribute('content', '#171717');
-						} else {
-							document.documentElement.classList.add('light');
-							document.documentElement.classList.remove('dark');
-							metaThemeColorTag.setAttribute('content', '#ffffff');
-						}
-					}
-				});
-				const isDarkMode = document.documentElement.classList.contains('dark');
-
-				const logo = document.createElement('img');
-				logo.id = 'logo';
-				logo.style =
-					'position: absolute; width: auto; height: 6rem; top: 44%; left: 50%; transform: translateX(-50%); display:block;';
-				logo.loading = 'eager';
-				logo.fetchPriority = 'high';
-				// LICENSE covers this Open WebUI splash logo.
-				// Do not alter, remove, obscure, or replace it except as LICENSE permits:
-				// https://docs.openwebui.com/license.
-				logo.src = isDarkMode ? '/static/splash-dark.png' : '/static/splash.png';
-
-				document.addEventListener('DOMContentLoaded', function () {
-					const splash = document.getElementById('splash-screen');
-					if (document.documentElement.classList.contains('her')) {
-						return;
-					}
-
-					if (splash) splash.prepend(logo);
-				});
-			})();
+			window.applyTheme();
 		</script>
 
-		<title>Open WebUI</title>
+		<title>ИННОМАЙТ</title>
 
 		%sveltekit.head%
 	</head>
@@ -133,8 +58,12 @@
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 
+		<!-- Startup-only vector lockup; application readiness owns removal. -->
 		<div
 			id="splash-screen"
+			role="status"
+			aria-label="ИННОМАЙТ"
+			aria-busy="true"
 			style="position: fixed; z-index: 100; top: 0; left: 0; width: 100%; height: 100%"
 		>
 			<style type="text/css" nonce="">
@@ -142,63 +71,98 @@
 					overflow-y: scroll !important;
 				}
 			</style>
-
-			<div
-				style="
-					position: absolute;
-					top: 33%;
-					left: 50%;
-
-					width: 24rem;
-					transform: translateX(-50%);
-
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-				"
-			>
-				<!-- LICENSE covers this Open WebUI splash logo.
-				Do not alter, remove, obscure, or replace it except as LICENSE permits:
-				https://docs.openwebui.com/license. -->
-				<img
-					id="logo-her"
-					style="width: auto; height: 13rem"
-					src="/static/splash.png"
-					loading="eager"
-					fetchpriority="high"
-					class="animate-pulse-fast"
-				/>
-
-				<div style="position: relative; width: 24rem; margin-top: 0.5rem">
-					<div
-						id="progress-background"
-						style="
-							position: absolute;
-							width: 100%;
-							height: 0.75rem;
-
-							border-radius: 9999px;
-							background-color: #fafafa9a;
-						"
-					></div>
-
-					<div
-						id="progress-bar"
-						style="
-							position: absolute;
-							width: 0%;
-							height: 0.75rem;
-							border-radius: 9999px;
-							background-color: #fff;
-						"
-						class="bg-white"
-					></div>
+			<div id="logo">
+				<svg
+					class="innomait-logo"
+					viewBox="85 337 1433.48 288"
+					xmlns="http://www.w3.org/2000/svg"
+					role="img"
+					aria-label="ИННОМАЙТ"
+					focusable="false"
+				>
+					<title>ИННОМАЙТ</title>
+					<defs>
+						<clipPath id="innomait-standard-word-clip">
+							<rect class="innomait-word-mask" x="499" y="400" width="1031.48" height="143" />
+						</clipPath>
+					</defs>
+					<g class="innomait-lockup">
+						<g class="innomait-symbol">
+							<path
+								class="innomait-core"
+								d="M316.296 337H397.273L448 413.194L402.858 481L357.715 413.194L216.704 625H135.727L85 548.806L130.142 481L175.285 548.806L316.296 337Z"
+								fill="currentColor"
+							/>
+							<path
+								class="innomait-top"
+								d="M268.828 408.301H178.544L130.143 481L85.0012 413.194L135.728 337H221.359L268.828 408.301Z"
+								fill="currentColor"
+							/>
+							<path
+								class="innomait-bottom"
+								d="M264.172 553.699H354.456L402.857 481L447.999 548.806L397.272 625H311.641L264.172 553.699Z"
+								fill="currentColor"
+							/>
+						</g>
+						<g clip-path="url(#innomait-standard-word-clip)">
+							<path
+								class="innomait-word"
+								d="M617.667 531H597.667V460.2L535 531H511V437.667H531V507.667L593.667 437.667H617.667V531ZM633.695 531V437.667H653.695V475H720.362V437.667H740.362V531H720.362V493.667H653.695V531H633.695ZM756.391 531V437.667H776.391V475H843.057V437.667H863.057V531H843.057V493.667H776.391V531H756.391ZM960.419 512.333C962.997 512.333 964.953 511.667 966.286 510.333C967.708 508.911 968.419 506.911 968.419 504.333V464.333C968.419 461.756 967.708 459.8 966.286 458.467C964.953 457.044 962.997 456.333 960.419 456.333H904.419C901.841 456.333 899.841 457.044 898.419 458.467C897.086 459.8 896.419 461.756 896.419 464.333V504.333C896.419 506.911 897.086 508.911 898.419 510.333C899.841 511.667 901.841 512.333 904.419 512.333H960.419ZM876.419 464.333C876.419 446.556 885.308 437.667 903.086 437.667H961.753C979.53 437.667 988.419 446.556 988.419 464.333V504.333C988.419 522.111 979.53 531 961.753 531H903.086C885.308 531 876.419 522.111 876.419 504.333V464.333ZM1021.78 463.667V531H1001.78V437.667H1027.11L1073.11 513.267L1118.45 437.667H1143.11V531H1123.11V463.667L1083.78 531H1062.45L1021.78 463.667ZM1282.5 531H1259.83L1248.1 510.333H1185.43L1173.83 531H1151.83L1204.5 437.667H1229.16L1282.5 531ZM1238.36 493L1216.5 454.467L1195.03 493H1238.36ZM1397.78 531H1377.78V460.2L1315.12 531H1291.12V437.667H1311.12V507.667L1373.78 437.667H1397.78V531ZM1320.45 412.333H1368.45V428.333H1320.45V412.333ZM1409.15 437.667H1518.48V456.333H1473.81V531H1453.81V456.333H1409.15V437.667Z"
+								fill="currentColor"
+							/>
+						</g>
+					</g>
+				</svg>
+			</div>
+			<div class="splash-her-content">
+				<div id="logo-her">
+					<svg
+						class="innomait-logo"
+						viewBox="85 337 1433.48 288"
+						xmlns="http://www.w3.org/2000/svg"
+						role="img"
+						aria-label="ИННОМАЙТ"
+						focusable="false"
+					>
+						<title>ИННОМАЙТ</title>
+						<defs>
+							<clipPath id="innomait-her-word-clip">
+								<rect class="innomait-word-mask" x="499" y="400" width="1031.48" height="143" />
+							</clipPath>
+						</defs>
+						<g class="innomait-lockup">
+							<g class="innomait-symbol">
+								<path
+									class="innomait-core"
+									d="M316.296 337H397.273L448 413.194L402.858 481L357.715 413.194L216.704 625H135.727L85 548.806L130.142 481L175.285 548.806L316.296 337Z"
+									fill="currentColor"
+								/>
+								<path
+									class="innomait-top"
+									d="M268.828 408.301H178.544L130.143 481L85.0012 413.194L135.728 337H221.359L268.828 408.301Z"
+									fill="currentColor"
+								/>
+								<path
+									class="innomait-bottom"
+									d="M264.172 553.699H354.456L402.857 481L447.999 548.806L397.272 625H311.641L264.172 553.699Z"
+									fill="currentColor"
+								/>
+							</g>
+							<g clip-path="url(#innomait-her-word-clip)">
+								<path
+									class="innomait-word"
+									d="M617.667 531H597.667V460.2L535 531H511V437.667H531V507.667L593.667 437.667H617.667V531ZM633.695 531V437.667H653.695V475H720.362V437.667H740.362V531H720.362V493.667H653.695V531H633.695ZM756.391 531V437.667H776.391V475H843.057V437.667H863.057V531H843.057V493.667H776.391V531H756.391ZM960.419 512.333C962.997 512.333 964.953 511.667 966.286 510.333C967.708 508.911 968.419 506.911 968.419 504.333V464.333C968.419 461.756 967.708 459.8 966.286 458.467C964.953 457.044 962.997 456.333 960.419 456.333H904.419C901.841 456.333 899.841 457.044 898.419 458.467C897.086 459.8 896.419 461.756 896.419 464.333V504.333C896.419 506.911 897.086 508.911 898.419 510.333C899.841 511.667 901.841 512.333 904.419 512.333H960.419ZM876.419 464.333C876.419 446.556 885.308 437.667 903.086 437.667H961.753C979.53 437.667 988.419 446.556 988.419 464.333V504.333C988.419 522.111 979.53 531 961.753 531H903.086C885.308 531 876.419 522.111 876.419 504.333V464.333ZM1021.78 463.667V531H1001.78V437.667H1027.11L1073.11 513.267L1118.45 437.667H1143.11V531H1123.11V463.667L1083.78 531H1062.45L1021.78 463.667ZM1282.5 531H1259.83L1248.1 510.333H1185.43L1173.83 531H1151.83L1204.5 437.667H1229.16L1282.5 531ZM1238.36 493L1216.5 454.467L1195.03 493H1238.36ZM1397.78 531H1377.78V460.2L1315.12 531H1291.12V437.667H1311.12V507.667L1373.78 437.667H1397.78V531ZM1320.45 412.333H1368.45V428.333H1320.45V412.333ZM1409.15 437.667H1518.48V456.333H1473.81V531H1453.81V456.333H1409.15V437.667Z"
+									fill="currentColor"
+								/>
+							</g>
+						</g>
+					</svg>
+				</div>
+				<div class="splash-progress-track" aria-hidden="true">
+					<div id="progress-background"></div>
+					<div id="progress-bar"></div>
 				</div>
 			</div>
-
-			<!-- <span style="position: absolute; bottom: 32px; left: 50%; margin: -36px 0 0 -36px">
-				Footer content
-			</span> -->
 		</div>
 	</body>
 
@@ -207,66 +171,188 @@
 			overflow-y: hidden !important;
 			overscroll-behavior-y: none;
 		}
-
-		#splash-screen {
-			background: #fff;
-		}
-
-		html.dark #splash-screen {
-			background: #000;
-		}
-
-		html.her #splash-screen {
-			background: #983724;
-		}
-
-		#logo-her {
-			display: none;
-		}
-
-		#progress-background {
-			display: none;
-		}
-
-		#progress-bar {
-			display: none;
-		}
-
-		html.her #logo {
-			display: none;
-		}
-
-		html.her #logo-her {
-			display: block;
-			filter: invert(1);
-		}
-
-		html.her #progress-background {
-			display: block;
-		}
-
-		html.her #progress-bar {
-			display: block;
-		}
-
-		@media (max-width: 24rem) {
-			html.her #progress-background {
-				display: none;
-			}
-
-			html.her #progress-bar {
-				display: none;
-			}
-		}
-
 		@keyframes pulse {
 			50% {
 				opacity: 0.65;
 			}
 		}
+		#splash-screen {
+			--innomait-enter-ease: cubic-bezier(0.16, 1, 0.3, 1);
+			background: var(--ow-canvas);
+			color: var(--ow-text);
+		}
 
-		.animate-pulse-fast {
-			animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+		#splash-screen #logo {
+			position: absolute;
+			top: 44%;
+			left: 50%;
+			width: min(24rem, calc(100vw - 2rem));
+			height: 6rem;
+			transform: translateX(-50%);
+		}
+
+		#splash-screen .splash-her-content {
+			position: absolute;
+			top: 33%;
+			left: 50%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			width: min(24rem, calc(100vw - 2rem));
+			transform: translateX(-50%);
+		}
+
+		#splash-screen #logo-her {
+			display: none;
+			width: 100%;
+			height: 13rem;
+		}
+
+		html.her #splash-screen #logo {
+			display: none;
+		}
+		html.her #splash-screen #logo-her {
+			display: block;
+		}
+
+		#splash-screen .innomait-logo {
+			display: block;
+			width: 100%;
+			height: 100%;
+			overflow: visible;
+		}
+
+		#splash-screen .innomait-core {
+			animation: innomait-core-enter 380ms var(--innomait-enter-ease) both;
+		}
+
+		#splash-screen .innomait-top {
+			animation: innomait-top-enter 360ms var(--innomait-enter-ease) 60ms both;
+		}
+
+		#splash-screen .innomait-bottom {
+			animation: innomait-bottom-enter 360ms var(--innomait-enter-ease) 100ms both;
+		}
+
+		#splash-screen .innomait-word {
+			animation: innomait-word-enter 380ms var(--innomait-enter-ease) 180ms both;
+		}
+
+		#splash-screen .innomait-word-mask {
+			transform-box: fill-box;
+			transform-origin: left center;
+			animation: innomait-word-reveal 440ms var(--innomait-enter-ease) 180ms both;
+		}
+
+		@keyframes innomait-core-enter {
+			from {
+				opacity: 0;
+				transform: translate(-20px, 20px);
+			}
+			to {
+				opacity: 1;
+				transform: translate(0, 0);
+			}
+		}
+
+		@keyframes innomait-top-enter {
+			from {
+				opacity: 0;
+				transform: translate(-24px, -18px);
+			}
+			to {
+				opacity: 1;
+				transform: translate(0, 0);
+			}
+		}
+
+		@keyframes innomait-bottom-enter {
+			from {
+				opacity: 0;
+				transform: translate(24px, 18px);
+			}
+			to {
+				opacity: 1;
+				transform: translate(0, 0);
+			}
+		}
+
+		@keyframes innomait-word-enter {
+			from {
+				opacity: 0;
+				transform: translateX(12px);
+			}
+			to {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		@keyframes innomait-word-reveal {
+			from {
+				transform: scaleX(0);
+			}
+			to {
+				transform: scaleX(1);
+			}
+		}
+
+		@keyframes innomait-logo-pulse {
+			0%,
+			100% {
+				opacity: 1;
+			}
+			50% {
+				opacity: 0.65;
+			}
+		}
+
+		html.her #splash-screen #logo-her .innomait-lockup {
+			animation: innomait-logo-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) 820ms infinite;
+		}
+
+		#splash-screen .splash-progress-track {
+			position: relative;
+			width: 100%;
+			height: 0.75rem;
+			margin-top: 0.5rem;
+		}
+
+		#splash-screen #progress-background,
+		#splash-screen #progress-bar {
+			display: none;
+			position: absolute;
+			height: 0.75rem;
+			border-radius: 9999px;
+		}
+
+		#splash-screen #progress-background {
+			width: 100%;
+			background: var(--ow-border);
+		}
+		#splash-screen #progress-bar {
+			width: 0%;
+			background: var(--ow-accent);
+		}
+
+		html.her #splash-screen #progress-background,
+		html.her #splash-screen #progress-bar {
+			display: block;
+		}
+
+		@media (max-width: 24rem) {
+			html.her #splash-screen #progress-background,
+			html.her #splash-screen #progress-bar {
+				display: none;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			#splash-screen .innomait-logo * {
+				animation: none !important;
+				opacity: 1;
+				transform: none;
+			}
 		}
 	</style>
 </html>

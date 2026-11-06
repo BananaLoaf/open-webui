@@ -17,8 +17,8 @@
 
 	const alertStyles: Record<AlertType, AlertTheme> = {
 		NOTE: {
-			border: 'border-sky-500',
-			text: 'text-sky-500',
+			border: 'border-brand-focus',
+			text: 'text-brand-text',
 			icon: Info
 		},
 		TIP: {
@@ -32,8 +32,8 @@
 			icon: Star
 		},
 		WARNING: {
-			border: 'border-yellow-500',
-			text: 'text-yellow-500',
+			border: 'border-brand-focus',
+			text: 'text-brand-text',
 			icon: ArrowRightCircle
 		},
 		CAUTION: {

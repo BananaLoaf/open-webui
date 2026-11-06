@@ -188,7 +188,7 @@
 					{/if}
 
 					<button
-						class="flex items-center gap-1 px-3.5 py-2 text-sm font-normal bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
+						class="flex items-center gap-1 px-3.5 py-2 text-sm font-normal bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full"
 						type="button"
 						id="copy-and-share-chat-button"
 						on:click={async () => {

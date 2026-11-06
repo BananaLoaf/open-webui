@@ -336,7 +336,7 @@
 
 				<div class="flex justify-end">
 					<button
-						class="flex items-center justify-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-white transition hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+						class="flex items-center justify-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-brand-foreground transition hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
 						on:click={closeModal}
 					>
 						{$i18n.t('Done')}
@@ -352,7 +352,7 @@
 
 				<div class="flex justify-end">
 					<button
-						class="flex items-center justify-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-white transition hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+						class="flex items-center justify-center gap-2 rounded-full bg-black px-4 py-2 text-sm text-brand-foreground transition hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
 						on:click={() => {
 							error = false;
 							errorMessage = '';
@@ -496,7 +496,7 @@
 					</button>
 
 					<button
-						class="px-3.5 py-1.5 text-sm font-normal bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition-colors rounded-full"
+						class="px-3.5 py-1.5 text-sm font-normal bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition-colors rounded-full"
 						on:click={syncStats}
 						disabled={syncing}
 					>

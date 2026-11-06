@@ -243,7 +243,7 @@
 						/>
 					{/if}
 					<label class="flex items-center gap-1.5 cursor-pointer text-xs text-gray-400 ml-auto">
-						<input type="checkbox" class="accent-blue-500" bind:checked={allDay} />
+						<input type="checkbox" class="accent-brand" bind:checked={allDay} />
 						{$i18n.t('All day')}
 					</label>
 				</div>
@@ -327,7 +327,7 @@
 					{$i18n.t('Cancel')}
 				</button>
 				<button
-					class="px-3.5 py-1.5 text-sm bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full flex items-center gap-2 {loading
+					class="px-3.5 py-1.5 text-sm bg-brand hover:bg-brand-hover text-brand-foreground dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full flex items-center gap-2 {loading
 						? 'cursor-not-allowed'
 						: ''}"
 					on:click={submitHandler}
