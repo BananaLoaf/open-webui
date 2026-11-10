@@ -5,7 +5,7 @@ from typing import Optional
 
 from open_webui.internal.db import Base, JSONField, get_async_db_context
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import JSON, BigInteger, Column, ForeignKey, Text, delete, select
+from sqlalchemy import JSON, BigInteger, Column, ForeignKey, Text, cast, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 log = logging.getLogger(__name__)
@@ -58,6 +58,29 @@ class SharedChatResponse(BaseModel):
 
 
 class SharedChatsTable:
+    async def get_chat_ids_by_file_id(
+        self, file_id: str, owner_id: str, db: AsyncSession | None = None
+    ) -> list[str]:
+        """Find actual snapshot attachments, including images without chat_file rows.
+
+        Only the file owner's snapshots can confer access this way: adding someone
+        else's file ID to a shared chat must never expose that person's file.
+        """
+        from open_webui.utils.chat_attachments import referenced_file_ids
+
+        async with get_async_db_context(db) as session:
+            result = await session.execute(
+                select(SharedChat).where(
+                    SharedChat.user_id == owner_id,
+                    cast(SharedChat.chat, Text).contains(file_id, autoescape=True),
+                )
+            )
+            return [
+                shared.chat_id
+                for shared in result.scalars().all()
+                if file_id in referenced_file_ids(shared.chat or {})
+            ]
+
     async def create(self, chat_id: str, user_id: str, db: Optional[AsyncSession] = None) -> Optional[SharedChatModel]:
         """
         Create a snapshot of the chat for link sharing.

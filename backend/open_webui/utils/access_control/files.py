@@ -8,6 +8,7 @@ from open_webui.models.folders import FolderModel
 from open_webui.models.groups import Groups
 from open_webui.models.knowledge import Knowledges
 from open_webui.models.models import Models
+from open_webui.models.shared_chats import SharedChats
 from open_webui.models.users import UserModel, Users
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -69,12 +70,14 @@ async def has_access_to_file(
         return True
 
     # Check if the file is associated with any chats the user has access to
-    shared_chat_ids = await Chats.get_shared_chat_ids_by_file_id(file_id, db=db)
+    shared_chat_ids = set(await Chats.get_shared_chat_ids_by_file_id(file_id, db=db))
+    if access_type == 'read':
+        shared_chat_ids.update(await SharedChats.get_chat_ids_by_file_id(file_id, file.user_id, db=db))
     if access_type == 'read' and shared_chat_ids:
         accessible_ids = await AccessGrants.get_accessible_resource_ids(
             user_id=user.id,
             resource_type='shared_chat',
-            resource_ids=shared_chat_ids,
+            resource_ids=list(shared_chat_ids),
             permission='read',
             user_group_ids=user_group_ids,
             db=db,
