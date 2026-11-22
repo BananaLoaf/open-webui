@@ -173,6 +173,107 @@
 		// Use FileSaver.js's saveAs function to save the generated CSV file.
 		saveAs(blob, `table-${id}-${tokenIdx}.csv`);
 	};
+
+	const getRenderedTable = (event: MouseEvent) => {
+		event.stopPropagation();
+		return (event.currentTarget as HTMLElement)
+			.closest('[data-markdown-table]')
+			?.querySelector('table');
+	};
+
+	const getTableRows = (table: HTMLTableElement) =>
+		Array.from(table.rows, (row) => Array.from(row.cells, (cell) => cell.innerText.trim()));
+
+	const copyTableFormats = async (html: string, text: string) => {
+		if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+			try {
+				await navigator.clipboard.write([
+					new ClipboardItem({
+						'text/html': new Blob([html], { type: 'text/html' }),
+						'text/plain': new Blob([text], { type: 'text/plain' })
+					})
+				]);
+				return true;
+			} catch {
+				// Older browsers and embedded views can still support HTML via the copy event.
+			}
+		}
+
+		let copied = false;
+		const onCopy = (event: ClipboardEvent) => {
+			if (!event.clipboardData) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			event.clipboardData.setData('text/html', html);
+			event.clipboardData.setData('text/plain', text);
+			copied = true;
+		};
+		document.addEventListener('copy', onCopy, true);
+		try {
+			return document.execCommand('copy') && copied;
+		} catch {
+			return false;
+		} finally {
+			document.removeEventListener('copy', onCopy, true);
+		}
+	};
+
+	const copyTableForExcel = async (event: MouseEvent) => {
+		const table = getRenderedTable(event);
+		if (!table) return;
+
+		const rows = getTableRows(table);
+		const text = rows
+			.map((row) =>
+				row
+					.map((cell) => (/[\t\r\n"]/.test(cell) ? '"' + cell.replace(/"/g, '""') + '"' : cell))
+					.join('\t')
+			)
+			.join('\r\n');
+
+		const htmlTable = document.createElement('table');
+		htmlTable.style.cssText = 'border-collapse:collapse;color:#111827;background:#fff';
+		const head = htmlTable.createTHead();
+		const body = htmlTable.createTBody();
+		for (const [index, row] of rows.entries()) {
+			const isHeader = index < (table.tHead?.rows.length ?? 0);
+			const htmlRow = (isHeader ? head : body).insertRow();
+			for (const value of row) {
+				const cell = document.createElement(isHeader ? 'th' : 'td');
+				cell.textContent = value;
+				cell.style.cssText = 'border:1px solid #d1d5db;padding:6px 10px;white-space:pre-wrap';
+				if (isHeader) cell.style.backgroundColor = '#f3f4f6';
+				htmlRow.appendChild(cell);
+			}
+		}
+
+		if (await copyTableFormats(htmlTable.outerHTML, text)) {
+			toast.success($i18n.t('Copied to clipboard'));
+		} else {
+			toast.error($i18n.t('Failed to copy table'));
+		}
+	};
+
+	const downloadTableAsExcel = async (event: MouseEvent, tokenIdx: number) => {
+		const table = getRenderedTable(event);
+		if (!table) return;
+
+		const rows = getTableRows(table);
+		try {
+			const XLSX = await import('xlsx');
+			const workbook = XLSX.utils.book_new();
+			XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(rows), 'Table');
+			const data = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+			saveAs(
+				new Blob([data], {
+					type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+				}),
+				`table-${id}-${tokenIdx}.xlsx`
+			);
+		} catch {
+			toast.error($i18n.t('Failed to download Excel file'));
+		}
+	};
 </script>
 
 <!-- {JSON.stringify(tokens)} -->
@@ -216,7 +317,7 @@
 			{token.text}
 		{/if}
 	{:else if token.type === 'table'}
-		<div class="relative w-full group mb-2">
+		<div class="relative w-full group mb-2" data-markdown-table>
 			<div class="scrollbar-hidden relative overflow-x-auto max-w-full">
 				<table
 					class=" w-full text-sm text-start text-gray-500 dark:text-gray-400 max-w-full rounded-xl"
@@ -275,27 +376,55 @@
 			</div>
 
 			<div class=" absolute top-1 right-1.5 z-20 hover-reveal flex gap-0.5">
-				<Tooltip content={$i18n.t('Copy')}>
+				<Tooltip content={$i18n.t('Copy Markdown table')}>
 					<button
-						class="p-1 rounded-lg bg-transparent transition"
+						type="button"
+						class="flex items-center gap-1 p-1 rounded-lg bg-transparent text-xs transition"
+						aria-label={$i18n.t('Copy Markdown table')}
 						on:click={(e) => {
 							e.stopPropagation();
 							copyToClipboard(token.raw.trim(), null, $settings?.copyFormatted ?? false);
 						}}
 					>
-						<Clipboard className=" size-3.5" strokeWidth="1.5" />
+						<Clipboard className="size-3.5" strokeWidth="1.5" />
+						Markdown
 					</button>
 				</Tooltip>
 
+				<Tooltip content={$i18n.t('Copy Excel table')}>
+					<button
+						type="button"
+						class="flex items-center gap-1 p-1 rounded-lg bg-transparent text-xs transition"
+						aria-label={$i18n.t('Copy Excel table')}
+						on:click={copyTableForExcel}
+					>
+						<Clipboard className="size-3.5" strokeWidth="1.5" />
+						Excel
+					</button>
+				</Tooltip>
 				<Tooltip content={$i18n.t('Export to CSV')}>
 					<button
-						class="p-1 rounded-lg bg-transparent transition"
+						type="button"
+						class="flex items-center gap-1 p-1 rounded-lg bg-transparent text-xs transition"
+						aria-label={$i18n.t('Export to CSV')}
 						on:click={(e) => {
 							e.stopPropagation();
 							exportTableToCSVHandler(token, tokenIdx);
 						}}
 					>
-						<Download className=" size-3.5" strokeWidth="1.5" />
+						<Download className="size-3.5" strokeWidth="1.5" />
+						CSV
+					</button>
+				</Tooltip>
+				<Tooltip content={$i18n.t('Download Excel file')}>
+					<button
+						type="button"
+						class="flex items-center gap-1 p-1 rounded-lg bg-transparent text-xs transition"
+						aria-label={$i18n.t('Download Excel file')}
+						on:click={(event) => downloadTableAsExcel(event, tokenIdx)}
+					>
+						<Download className="size-3.5" strokeWidth="1.5" />
+						XLSX
 					</button>
 				</Tooltip>
 			</div>
