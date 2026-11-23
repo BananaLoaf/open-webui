@@ -74,6 +74,29 @@ def trim_stateful_messages(messages: list[dict], regeneration: bool = False) -> 
     return ([system_message] if system_message else []) + current_input
 
 
+def recover_missing_response_payload(
+    payload: dict,
+    status_code: int,
+    detail: str,
+) -> dict | None:
+    """Leave the API server to restore context from the existing chat session."""
+    anchor = payload.get('previous_response_id')
+    if (
+        status_code != 404
+        or not anchor
+        or payload.get('conversation')
+        or detail != f'Previous response not found: {anchor}'
+    ):
+        return None
+    messages = trim_stateful_messages(payload.get('messages', []))
+    if not messages or messages[-1].get('role') != 'user':
+        return None
+    retry_payload = {**payload, 'messages': messages}
+    retry_payload.pop('previous_response_id')
+    retry_payload.pop('conversation_history', None)
+    return retry_payload
+
+
 def get_response_metadata(response: dict) -> dict:
     """Return response-level state carried by a Responses lifecycle event."""
     status = response.get('status')

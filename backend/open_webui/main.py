@@ -269,6 +269,7 @@ from open_webui.utils.oauth import (
 )
 from open_webui.utils.plugin import install_tool_and_function_dependencies
 from open_webui.utils.redis import get_redis_client
+from open_webui.utils.responses_state import recover_missing_response_payload
 from open_webui.utils.session_pool import cleanup_response, get_client_timeout, get_session, stream_wrapper
 from open_webui.utils.tool_approval import (
     ResolveToolCallForm,
@@ -1658,7 +1659,21 @@ async def chat_completion(
             if await drain_approved_tool_calls(request, form_data, user, model, metadata):
                 return {'status': True, 'chat_id': metadata.get('chat_id'), 'paused': True}
 
+            resume_payload = None
+            if form_data.get('previous_response_id') and is_saved_chat_id(metadata.get('chat_id')):
+                # File forwarding can add provider-specific parts to the first request.
+                resume_payload = {**form_data, 'messages': copy.deepcopy(form_data.get('messages', []))}
+
             response = await chat_completion_handler(request, form_data, user)
+
+            if resume_payload is not None and isinstance(response, JSONResponse) and response.status_code == 404:
+                retry_payload = recover_missing_response_payload(
+                    resume_payload, response.status_code, get_response_error_detail(response)
+                )
+                if retry_payload is not None:
+                    log.info('Responses anchor missing; resuming by chat session')
+                    form_data = retry_payload
+                    response = await chat_completion_handler(request, form_data, user)
 
             # When the upstream provider returns an error (e.g. HTTP 400
             # content-filter, quota exceeded), generate_chat_completion

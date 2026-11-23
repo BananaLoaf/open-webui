@@ -173,6 +173,63 @@ def test_guided_regeneration_keeps_original_and_regeneration_prompts(responses_s
     ) == [original, regeneration]
 
 
+def test_missing_response_resumes_chat_with_only_latest_user_message(responses_state):
+    latest_user = {
+        'role': 'user',
+        'content': [
+            {'type': 'text', 'text': 'What is in this image?'},
+            {'type': 'image_url', 'image_url': {'url': 'data:image/png;base64,AA=='}},
+        ],
+    }
+    payload = {
+        'messages': [
+            {'role': 'system', 'content': 'Instructions'},
+            {'role': 'user', 'content': 'Earlier question'},
+            {'role': 'assistant', 'content': 'Earlier answer'},
+            latest_user,
+        ],
+        'previous_response_id': 'resp_old',
+        'conversation_history': [{'role': 'user', 'content': 'Explicit history'}],
+        'metadata': {'chat_id': 'chat-1'},
+        'stream': True,
+    }
+
+    retry = responses_state.recover_missing_response_payload(payload, 404, 'Previous response not found: resp_old')
+
+    assert retry == {
+        'messages': [payload['messages'][0], latest_user],
+        'metadata': {'chat_id': 'chat-1'},
+        'stream': True,
+    }
+    assert payload['previous_response_id'] == 'resp_old'
+    request = responses_state.convert_to_responses_payload(retry)
+    assert request['instructions'] == 'Instructions'
+    assert [item['role'] for item in request['input']] == ['user']
+    assert [part['type'] for part in request['input'][0]['content']] == ['input_text', 'input_image']
+
+
+@pytest.mark.parametrize(
+    ('status', 'detail', 'overrides'),
+    [
+        (404, 'Model not found', {}),
+        (404, 'Previous response not found: resp_other', {}),
+        (500, 'Previous response not found: resp_old', {}),
+        (404, 'Previous response not found: resp_old', {'previous_response_id': 'resp_new'}),
+        (404, 'Previous response not found: resp_old', {'previous_response_id': None}),
+        (404, 'Previous response not found: resp_old', {'conversation': 'conv_1'}),
+        (404, 'Previous response not found: resp_old', {'messages': [{'role': 'system', 'content': 'Instructions'}]}),
+    ],
+)
+def test_missing_response_does_not_retry_other_errors(responses_state, status, detail, overrides):
+    payload = {
+        'previous_response_id': 'resp_old',
+        'messages': [{'role': 'user', 'content': 'Next question'}],
+        **overrides,
+    }
+
+    assert responses_state.recover_missing_response_payload(payload, status, detail) is None
+
+
 def test_streaming_completion_metadata_exposes_response_lifecycle(responses_state):
     usage = {'input_tokens': 10, 'output_tokens': 4}
 
