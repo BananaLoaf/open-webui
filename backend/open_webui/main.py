@@ -122,6 +122,7 @@ from open_webui.env import (
     WEBUI_ADMIN_PASSWORD,
     WEBUI_AUTH_TRUSTED_EMAIL_HEADER,
     WEBUI_BUILD_HASH,
+    WEBUI_CABINET_URL,
     WEBUI_SECRET_KEY,
     WEBUI_SESSION_COOKIE_SAME_SITE,
     WEBUI_SESSION_COOKIE_SECURE,
@@ -2454,6 +2455,7 @@ async def get_app_config(request: Request):
                     'pending_user_overlay_content': config.get('ui.pending_user_overlay_content'),
                     'response_watermark': config.get('ui.watermark'),
                     'iframe_csp': IFRAME_CSP,
+                    'cabinet_url': WEBUI_CABINET_URL or None,
                 },
                 'license_metadata': license_metadata,
                 **(

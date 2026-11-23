@@ -86,6 +86,7 @@
 	import SearchIcon from './Sidebar/icons/Search.svelte';
 	import Sidebar from '../icons/Sidebar.svelte';
 	import WorkspaceIcon from './Sidebar/icons/Workspace.svelte';
+	import UserCircle from '../icons/UserCircle.svelte';
 	import HotkeyHint from '../common/HotkeyHint.svelte';
 	import Dropdown from '../common/Dropdown.svelte';
 	import DropdownMenu from '../common/DropdownMenu.svelte';
@@ -95,6 +96,18 @@
 
 	const BREAKPOINT = 768;
 	const DEFAULT_PINNED_ITEMS = ['notes', 'workspace'];
+
+	const getCabinetUrl = (value?: string | null) => {
+		if (!value) return null;
+		try {
+			const url = new URL(value);
+			return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+		} catch {
+			return null;
+		}
+	};
+
+	$: cabinetUrl = getCabinetUrl($config?.ui?.cabinet_url);
 
 	let scrollTop = 0;
 
@@ -1004,6 +1017,28 @@
 						</Tooltip>
 					</div>
 
+					{#if cabinetUrl}
+						<div>
+							<Tooltip content={$i18n.t('Personal account')} placement="right">
+								<a
+									class="cursor-pointer flex size-8 items-center justify-center transition group"
+									href={cabinetUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									draggable="false"
+									on:click|stopPropagation
+									aria-label={$i18n.t('Personal account')}
+								>
+									<div
+										class="self-center flex size-[calc(30px*var(--app-text-scale,1))] items-center justify-center rounded-lg transition group-hover:bg-gray-100 dark:group-hover:bg-gray-900"
+									>
+										<UserCircle className="size-4" />
+									</div>
+								</a>
+							</Tooltip>
+						</div>
+					{/if}
+
 					<div>
 						<Tooltip content={$i18n.t('Search')} placement="right">
 							<button
@@ -1229,6 +1264,25 @@
 								<HotkeyHint name="newChat" className=" hover-reveal " />
 							</a>
 						</div>
+
+						{#if cabinetUrl}
+							<div class="px-1 flex justify-center text-gray-700 dark:text-gray-300">
+								<a
+									class="group grow flex items-center space-x-2 rounded-xl px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-900 transition outline-none"
+									href={cabinetUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									draggable="false"
+								>
+									<div class="self-center flex size-4 shrink-0 items-center justify-center">
+										<UserCircle className="size-4" />
+									</div>
+									<div class="self-center text-[0.8125rem] leading-5">
+										{$i18n.t('Personal account')}
+									</div>
+								</a>
+							</div>
+						{/if}
 
 						<div class="px-1 flex justify-center text-gray-700 dark:text-gray-300">
 							<button

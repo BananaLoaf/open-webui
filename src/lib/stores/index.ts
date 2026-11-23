@@ -380,6 +380,7 @@ type Config = {
 		pending_user_overlay_content?: string;
 		response_watermark?: string;
 		iframe_csp?: string;
+		cabinet_url?: string | null;
 	};
 };
 
