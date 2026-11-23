@@ -44,6 +44,7 @@
 	export let forkHandler: Function | null = null;
 
 	export let readOnly = false;
+	export let submissionBlocked = false;
 	export let allowDelete = true;
 	export let compactPreview = false;
 	export let editCodeBlock = true;
@@ -316,6 +317,7 @@
 	};
 
 	const editMessage = async (messageId, { content, files, output = undefined }, submit = true) => {
+		if (submissionBlocked && submit && history.messages[messageId]?.role === 'user') return;
 		if ((selectedModels ?? []).filter((id) => id).length === 0) {
 			toast.error($i18n.t('Model not selected'));
 			return;

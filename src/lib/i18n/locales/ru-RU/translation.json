@@ -1861,6 +1861,7 @@
 	"Retrieved {{count}} sources_other": "Найдено {{count}} источников",
 	"Retrieved 1 source": "Найден 1 источник",
 	"Retry": "Повторить",
+	"Retry the last request before sending a new message.": "Повторите последний запрос, чтобы продолжить переписку.",
 	"Rewrite the selected text.": "Переписать выделенный текст.",
 	"Role": "Роль",
 	"RTL": "RTL",

@@ -14,9 +14,12 @@
 	export let id: string;
 	export let content: string;
 	export let files: any[] = [];
+	export let paused = false;
 	export let onSendNow: (id: string) => void;
 	export let onEdit: (id: string) => void;
 	export let onDelete: (id: string) => void;
+
+	$: waitingForFiles = files.some((file) => ['uploading', 'error'].includes(file.status));
 </script>
 
 <div class="flex items-center gap-2 px-2 py-1.5">
@@ -81,27 +84,15 @@
 	<!-- Actions -->
 	<div class="flex items-center gap-1 shrink-0">
 		<!-- Send immediately -->
-		<Tooltip
-			content={files.some((file) => ['uploading', 'error'].includes(file.status))
-				? $i18n.t('Waiting for upload')
-				: $i18n.t('Send now')}
-		>
+		<Tooltip content={waitingForFiles ? $i18n.t('Waiting for upload') : $i18n.t('Send now')}>
 			<button
 				type="button"
-				class="p-1 text-gray-400 transition-colors {files.some((file) =>
-					['uploading', 'error'].includes(file.status)
-				)
+				class="p-1 text-gray-400 transition-colors {paused || waitingForFiles
 					? 'opacity-40 cursor-not-allowed'
 					: 'hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300'}"
-				disabled={files.some((file) => ['uploading', 'error'].includes(file.status))}
-				on:click={() => {
-					if (!files.some((file) => ['uploading', 'error'].includes(file.status))) {
-						onSendNow(id);
-					}
-				}}
-				aria-label={files.some((file) => ['uploading', 'error'].includes(file.status))
-					? $i18n.t('Waiting for upload')
-					: $i18n.t('Send now')}
+				disabled={paused || waitingForFiles}
+				on:click={() => onSendNow(id)}
+				aria-label={waitingForFiles ? $i18n.t('Waiting for upload') : $i18n.t('Send now')}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +115,8 @@
 		<Tooltip content={$i18n.t('Edit')}>
 			<button
 				type="button"
-				class="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+				class="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+				disabled={paused}
 				on:click={() => onEdit(id)}
 				aria-label={$i18n.t('Edit')}
 			>

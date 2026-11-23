@@ -1829,6 +1829,7 @@
 	"Retrieved {{count}} sources_other": "",
 	"Retrieved 1 source": "",
 	"Retry": "",
+	"Retry the last request before sending a new message.": "",
 	"Rewrite the selected text.": "",
 	"Role": "",
 	"RTL": "",

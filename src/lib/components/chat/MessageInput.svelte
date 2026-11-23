@@ -97,6 +97,7 @@
 	import Cube from '../icons/Cube.svelte';
 	import Sparkles from '../icons/Sparkles.svelte';
 	import Mic from '../icons/Mic.svelte';
+	import ArrowPath from '../icons/ArrowPath.svelte';
 
 	import InputVariablesModal from './MessageInput/InputVariablesModal.svelte';
 	import Voice from '../icons/Voice.svelte';
@@ -159,6 +160,8 @@
 	);
 
 	export let history;
+	export let submissionBlocked = false;
+	export let onRetry: (() => void) | null = null;
 	export let taskIds = null;
 	export let askUser: AskUserPrompt = {
 		show: false,
@@ -586,9 +589,14 @@
 	};
 
 	const createSkillHandler = async () => {
+		if (submissionBlocked) return;
 		prompt = '/skills:create';
 		await tick();
-		dispatch('submit', prompt);
+		submitInput();
+	};
+
+	const submitInput = () => {
+		if (!submissionBlocked) dispatch('submit', prompt);
 	};
 
 	const insertTextAtCursor = async (text: string) => {
@@ -734,6 +742,10 @@
 	let inputFiles;
 
 	let showInputModal = false;
+	$: if (submissionBlocked) {
+		showInputModal = false;
+		recording = false;
+	}
 
 	export let dragged = false;
 	export let dropzoneId = 'chat-pane';
@@ -1745,6 +1757,7 @@
 								const { text, filename } = data;
 
 								recording = false;
+								if (submissionBlocked) return;
 
 								await tick();
 								await insertTextAtCursor(`${text}`);
@@ -1752,16 +1765,14 @@
 								focus({ preventScroll: true });
 
 								if ($settings?.speechAutoSend ?? false) {
-									dispatch('submit', prompt);
+									submitInput();
 								}
 							}}
 						/>
 					</div>
 					<form
 						class="w-full flex flex-col gap-1.5 {recording ? 'hidden' : ''}"
-						on:submit|preventDefault={() => {
-							dispatch('submit', prompt);
-						}}
+						on:submit|preventDefault={submitInput}
 					>
 						<button
 							id="generate-message-pair-button"
@@ -1805,6 +1816,7 @@
 										id={queuedMessage.id}
 										content={queuedMessage.prompt}
 										files={queuedMessage.files}
+										paused={submissionBlocked}
 										onSendNow={onQueueSendNow}
 										onEdit={onQueueEdit}
 										onDelete={onQueueDelete}
@@ -2024,7 +2036,7 @@
 							{/if}
 
 							<div class="px-2 relative">
-								{#if prompt.split('\n').length > 2}
+								{#if !submissionBlocked && prompt.split('\n').length > 2}
 									<button
 										type="button"
 										class="absolute top-2.5 right-3 z-20 p-1 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
@@ -2045,6 +2057,7 @@
 											: 'pt-2'
 										: ''}"
 									id="chat-input-container"
+									class:opacity-60={submissionBlocked}
 								>
 									{#if suggestions}
 										{#key $settings?.richTextInput ?? true}
@@ -2052,7 +2065,7 @@
 												<RichTextInput
 													bind:this={chatInputElement}
 													id="chat-input"
-													editable={!showInputModal}
+													editable={!submissionBlocked && !showInputModal}
 													onChange={(content) => {
 														prompt = content.md;
 														inputContent = content;
@@ -2061,7 +2074,8 @@
 													json={true}
 													richText={$settings?.richTextInput ?? true}
 													messageInput={true}
-													followUpSuggestion={!generating &&
+													followUpSuggestion={!submissionBlocked &&
+													!generating &&
 													history?.messages?.[history?.currentId]?.role === 'assistant' &&
 													history?.messages?.[history?.currentId]?.done
 														? (history.messages[history.currentId].followUps?.[0] ?? '')
@@ -2078,7 +2092,8 @@
 														)}
 													placeholder={placeholder ? placeholder : $i18n.t('Send a Message')}
 													largeTextAsFile={($settings?.largeTextAsFile ?? false) && !shiftKey}
-													autocomplete={$config?.features?.enable_autocomplete_generation &&
+													autocomplete={!submissionBlocked &&
+														$config?.features?.enable_autocomplete_generation &&
 														($settings?.promptAutocomplete ?? false)}
 													generateAutoCompletion={async (text) => {
 														if (selectedModelIds.length === 0 || !selectedModelIds.at(0)) {
@@ -2108,6 +2123,7 @@
 														isComposing = false;
 													}}
 													on:keydown={async (e) => {
+														if (submissionBlocked) return;
 														e = e.detail.event;
 
 														const isCtrlPressed = e.ctrlKey || e.metaKey; // metaKey is for Cmd key on Mac
@@ -2160,7 +2176,7 @@
 																if (enterPressed) {
 																	e.preventDefault();
 																	if (prompt !== '' || files.length > 0) {
-																		dispatch('submit', prompt);
+																		submitInput();
 																	}
 																}
 															}
@@ -2178,6 +2194,10 @@
 														}
 													}}
 													on:paste={async (e) => {
+														if (submissionBlocked) {
+															e.detail.event.preventDefault();
+															return;
+														}
 														e = e.detail.event;
 														console.log(e);
 
@@ -2600,7 +2620,21 @@
 										</Tooltip>
 									{/if}
 
-									{#if isActive && prompt === '' && files.length === 0}
+									{#if submissionBlocked && (onRetry || !isActive)}
+										<div class="flex items-center">
+											<Tooltip content={$i18n.t('Retry')}>
+												<button
+													type="button"
+													class="bg-brand text-brand-foreground hover:bg-brand-hover dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover transition rounded-full p-[0.3125rem] self-center disabled:opacity-50"
+													disabled={!onRetry}
+													aria-label={$i18n.t('Retry')}
+													on:click={() => onRetry?.()}
+												>
+													<ArrowPath className="size-5" strokeWidth="2" />
+												</button>
+											</Tooltip>
+										</div>
+									{:else if isActive && (submissionBlocked || (prompt === '' && files.length === 0))}
 										<div class=" flex items-center">
 											<Tooltip content={$i18n.t('Stop')}>
 												<button
@@ -2740,11 +2774,14 @@
 												>
 													<button
 														id="send-message-button"
-														class="{!(prompt === '' && files.length === 0) || uploadPending
+														class="{!submissionBlocked &&
+														(!(prompt === '' && files.length === 0) || uploadPending)
 															? 'bg-brand text-brand-foreground hover:bg-brand-hover dark:bg-brand dark:text-brand-foreground dark:hover:bg-brand-hover '
 															: 'text-white bg-gray-200 dark:text-gray-900 dark:bg-gray-700 disabled'} transition rounded-full p-[0.3125rem] self-center"
 														type="submit"
-														disabled={(prompt === '' && files.length === 0) || uploadPending}
+														disabled={submissionBlocked ||
+															(prompt === '' && files.length === 0) ||
+															uploadPending}
 													>
 														{#if uploadPending}
 															<Spinner className="size-5" />

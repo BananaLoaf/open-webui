@@ -417,6 +417,33 @@
 		currentId: null
 	};
 
+	const getRetryRequiredResponse = (chatHistory) => {
+		const current = chatHistory.messages[chatHistory.currentId];
+		if (current?.role !== 'assistant') return null;
+		if (current.error) return current;
+		if (current.done) return null;
+
+		// A retry creates a pending sibling. Keep sending blocked until it succeeds.
+		const siblings = chatHistory.messages[current.parentId]?.childrenIds ?? [];
+		return (
+			siblings
+				.map((id) => chatHistory.messages[id])
+				.find(
+					(message) =>
+						message?.role === 'assistant' &&
+						message.error &&
+						message.model === current.model &&
+						(message.modelIdx ?? 0) === (current.modelIdx ?? 0)
+				) ?? null
+		);
+	};
+
+	$: retryRequiredResponse = getRetryRequiredResponse(history);
+	$: canRetryLastResponse =
+		retryRequiredResponse &&
+		history.currentId === retryRequiredResponse.id &&
+		($user?.role === 'admin' || ($user?.permissions?.chat?.regenerate_response ?? true));
+
 	let taskIds = null;
 
 	// Chat Input
@@ -2489,7 +2516,12 @@
 	let processingQueueChats = new Set<string>();
 
 	const processNextInQueue = async (targetChatId: string) => {
-		if (processingQueueChats.has(targetChatId)) return;
+		if (
+			targetChatId !== $chatId ||
+			processingQueueChats.has(targetChatId) ||
+			getRetryRequiredResponse(history)
+		)
+			return;
 
 		const queue = $chatRequestQueues[targetChatId];
 		if (!queue || queue.length === 0) return;
@@ -2528,22 +2560,24 @@
 	};
 
 	const sendQueuedMessageNow = async (id) => {
+		if (getRetryRequiredResponse(history)) return;
+		const targetChatId = $chatId;
 		const queue = $chatRequestQueues[$chatId] ?? [];
 		const item = queue.find((m) => m.id === id);
 		if (!item || (item.files ?? []).some((file) => ['uploading', 'error'].includes(file.status))) {
 			return;
 		}
 
-		chatRequestQueues.update((q) => ({
-			...q,
-			[$chatId]: queue.filter((m) => m.id !== id)
-		}));
 		await stopResponse(false);
 		await tick();
+		if ($chatId !== targetChatId || getRetryRequiredResponse(history)) return;
+		if (!$chatRequestQueues[targetChatId]?.some((message) => message.id === id)) return;
+		deleteQueuedMessage(id);
 		await submitPrompt(item.prompt, item.files);
 	};
 
 	const editQueuedMessage = (id) => {
+		if (getRetryRequiredResponse(history)) return;
 		const queue = $chatRequestQueues[$chatId] ?? [];
 		const item = queue.find((m) => m.id === id);
 		if (!item) return;
@@ -2635,6 +2669,7 @@
 	};
 
 	const createMessagePair = async (userPrompt) => {
+		if (getRetryRequiredResponse(history)) return;
 		messageInput?.setText('');
 		if (selectedModels.length === 0) {
 			toast.error($i18n.t('Model not selected'));
@@ -2905,6 +2940,7 @@
 	//////////////////////////
 
 	const submitPrompt = async (inputContent, inputFiles) => {
+		if (getRetryRequiredResponse(history)) return;
 		const _files = structuredClone(inputFiles);
 
 		chatFiles.push(
@@ -3093,6 +3129,7 @@
 	};
 
 	const submitHandler = async (userPrompt, { _raw = false } = {}) => {
+		if (getRetryRequiredResponse(history)) return;
 		console.log('submitHandler', userPrompt, $chatId);
 
 		const _selectedModels = selectedModels.map((modelId) =>
@@ -3211,6 +3248,8 @@
 				await tick();
 			}
 		}
+
+		if (getRetryRequiredResponse(history)) return;
 
 		// Clear input and submit
 		messageInput?.setText('');
@@ -3806,6 +3845,7 @@
 	};
 
 	const submitMessage = async (parentId, prompt) => {
+		if (getRetryRequiredResponse(history)) return;
 		let userPrompt = prompt;
 		let userMessageId = uuidv4();
 
@@ -3841,6 +3881,22 @@
 	const regenerateResponse = async (message, suggestionPrompt = null) => {
 		console.log('regenerateResponse');
 
+		const failed = getRetryRequiredResponse(history);
+		if (failed) {
+			if (history.currentId !== failed.id || message.id !== failed.id || suggestionPrompt) return;
+			if ($user?.role !== 'admin' && $user?.permissions?.chat?.regenerate_response === false)
+				return;
+			if (!$models.some((model) => model.id === failed.model)) {
+				toast.error($i18n.t('Model not found'));
+				return;
+			}
+			await sendMessage(history, failed.parentId, {
+				modelId: failed.model,
+				modelIdx: failed.modelIdx
+			});
+			return;
+		}
+
 		if (history.currentId) {
 			let userMessage = history.messages[message.parentId];
 
@@ -3872,6 +3928,7 @@
 	};
 
 	const continueResponse = async () => {
+		if (getRetryRequiredResponse(history)) return;
 		console.log('continueResponse');
 		const _chatId = JSON.parse(JSON.stringify($chatId));
 
@@ -4419,6 +4476,7 @@
 										{chatActionHandler}
 										{addMessages}
 										{onToolCallResolved}
+										submissionBlocked={Boolean(retryRequiredResponse)}
 										allowDelete={!(generating || taskIds?.length)}
 										forkHandler={handleForkChat}
 										topPadding={!embedded}
@@ -4436,6 +4494,22 @@
 									</div>
 								</div>
 							{:else}
+								{#if retryRequiredResponse && history.currentId === retryRequiredResponse.id}
+									<div class="flex items-center justify-center gap-3 px-4 pb-2 text-sm">
+										<span class="text-gray-500 dark:text-gray-400">
+											{$i18n.t('Retry the last request before sending a new message.')}
+										</span>
+										{#if canRetryLastResponse}
+											<button
+												type="button"
+												class="rounded-lg border border-gray-200 px-3 py-1.5 font-medium hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+												on:click={() => regenerateResponse(retryRequiredResponse)}
+											>
+												{$i18n.t('Retry')}
+											</button>
+										{/if}
+									</div>
+								{/if}
 								<div
 									id={embedded ? messageInputDropzoneId : undefined}
 									class=" pb-2 {dragged ? 'z-0' : 'z-10'}"
@@ -4443,6 +4517,10 @@
 									<MessageInput
 										bind:this={messageInput}
 										{history}
+										submissionBlocked={Boolean(retryRequiredResponse)}
+										onRetry={canRetryLastResponse
+											? () => regenerateResponse(retryRequiredResponse)
+											: null}
 										{taskIds}
 										bind:selectedModels
 										bind:files
@@ -4490,6 +4568,7 @@
 											showChatVariablesModal = true;
 										}}
 										on:submit={async (e) => {
+											if (getRetryRequiredResponse(history)) return;
 											clearDraft(getDraftChatId());
 											if (e.detail || files.length > 0) {
 												await tick();
