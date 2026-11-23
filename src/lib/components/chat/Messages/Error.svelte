@@ -1,9 +1,5 @@
-<script lang="ts">
-	import Info from '$lib/components/icons/Info.svelte';
-
-	export let content: unknown = '';
-
-	const getErrorMessage = (value: unknown): string => {
+<script context="module" lang="ts">
+	export const getErrorMessage = (value: unknown): string => {
 		if (typeof value === 'string') {
 			return value;
 		}
@@ -33,8 +29,26 @@
 
 		return JSON.stringify(value) ?? String(value);
 	};
+</script>
 
-	$: message = getErrorMessage(content) || 'Error submitting message';
+<script lang="ts">
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import type { i18n as I18n } from 'i18next';
+	import Info from '$lib/components/icons/Info.svelte';
+
+	export let content: unknown = '';
+
+	const i18n = getContext<Writable<I18n>>('i18n');
+
+	$: rawMessage = getErrorMessage(content);
+	$: message =
+		rawMessage === 'unknown_execution'
+			? $i18n.t('The outcome of the previous request is unknown. Start a new chat to continue.')
+			: rawMessage === 'response_stream_interrupted' ||
+				  rawMessage.startsWith('Response payload is not completed:')
+				? $i18n.t('The connection was interrupted before the response finished.')
+				: rawMessage || 'Error submitting message';
 </script>
 
 <div

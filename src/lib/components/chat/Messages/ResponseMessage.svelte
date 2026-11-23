@@ -53,7 +53,7 @@
 
 	import DeleteConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 
-	import Error from './Error.svelte';
+	import Error, { getErrorMessage } from './Error.svelte';
 	import Citations from './Citations.svelte';
 	import CodeExecutions from './CodeExecutions.svelte';
 	import ContentRenderer from './ContentRenderer.svelte';
@@ -196,6 +196,14 @@
 	$: visibleResponseContent =
 		getOutputText(message.output) || removeAllDetails(message.content ?? '');
 	$: hasResponseContent = Boolean((message.content ?? '').trim() || message.output?.length);
+	$: errorContent =
+		typeof message.error === 'object'
+			? (message.error?.content ?? message.content)
+			: message.content;
+	$: repeatsError =
+		message.error &&
+		visibleResponseContent.trim() === getErrorMessage(errorContent).trim() &&
+		(message.output ?? []).every((item) => item.type === 'message');
 
 	let edit = false;
 	let editedContent = '';
@@ -831,7 +839,7 @@
 							class="w-full flex flex-col relative {edit ? 'hidden' : ''}"
 							id="response-content-container"
 						>
-							{#if hasResponseContent && message.error !== true}
+							{#if hasResponseContent && message.error !== true && !repeatsError}
 								<!-- always show message contents even if there's an error -->
 								<!-- unless message.error === true which is legacy error handling, where the error message is stored in message.content -->
 								<ContentRenderer
@@ -903,7 +911,7 @@
 							{/if}
 
 							{#if message?.error}
-								<Error content={message?.error?.content ?? message.content} />
+								<Error content={errorContent} />
 							{/if}
 
 							{#if (message?.sources || message?.citations) && (model?.info?.meta?.capabilities?.citations ?? true)}

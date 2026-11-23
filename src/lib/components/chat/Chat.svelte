@@ -1282,6 +1282,10 @@
 						}
 					}, 100);
 				} else if (type === 'chat:message:error') {
+					if (data.output) {
+						message.output = data.output;
+						message.content = getOutputText(data.output);
+					}
 					message.error = data.error;
 					if (data.done === true && !message.done) {
 						message.done = true;

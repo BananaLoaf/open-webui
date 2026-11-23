@@ -18,6 +18,7 @@ from typing import Any, Optional
 from urllib.parse import unquote
 from uuid import uuid4
 
+from aiohttp import ClientPayloadError
 from aiocache import cached
 from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -6404,6 +6405,8 @@ async def streaming_chat_response_handler(response, ctx):
                             break
                         else:
                             break
+                    except ClientPayloadError:
+                        raise
                     except Exception as e:
                         error_content = get_message_error_content(e)
                         log.exception('Tool-call continuation failed: %s', error_content)
@@ -6603,6 +6606,8 @@ async def streaming_chat_response_handler(response, ctx):
                                 break
                             else:
                                 break
+                        except ClientPayloadError:
+                            raise
                         except Exception as e:
                             error_content = get_message_error_content(e)
                             log.exception('Code interpreter continuation failed: %s', error_content)
@@ -6675,6 +6680,26 @@ async def streaming_chat_response_handler(response, ctx):
                 }
                 await outlet_filter_handler(ctx)
                 await background_tasks_handler(ctx)
+            except ClientPayloadError:
+                log.exception('Upstream response stream was interrupted')
+                partial_output = full_output()
+                for item in partial_output:
+                    if item.get('status') == 'in_progress':
+                        item['status'] = 'incomplete'
+                error = {'content': 'response_stream_interrupted'}
+                if save_to_chat:
+                    await Chats.upsert_message_to_chat_by_id_and_message_id(
+                        metadata['chat_id'],
+                        metadata['message_id'],
+                        {'done': True, 'output': partial_output, 'error': error},
+                    )
+                await clear_response_stream(request.app.state.redis, response_stream_task_id)
+                await event_emitter(
+                    {
+                        'type': 'chat:message:error',
+                        'data': {'error': error, 'done': True, 'output': partial_output},
+                    }
+                )
             except asyncio.CancelledError:
                 log.warning('Task was cancelled!')
 
