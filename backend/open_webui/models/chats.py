@@ -1139,7 +1139,7 @@ class ChatTable:
         return message.get(metadata_key)
 
     async def upsert_message_to_chat_by_id_and_message_id(
-        self, id: str, message_id: str, message: dict, *, touch: bool = True
+        self, id: str, message_id: str, message: dict, *, touch: bool = True, response_id: str | None = None
     ) -> ChatModel | None:
         if not message.get('content'):
             output_text = get_output_text(message.get('output'))
@@ -1164,6 +1164,11 @@ class ChatTable:
                 self._repair_chat_current_id(chat)
 
                 history = chat.get('history', {})
+                if response_id:
+                    previous = history.get('messages', {}).get(message_id) or {}
+                    meta = message.get('meta', previous.get('meta'))
+                    message['responseId'] = response_id
+                    message['meta'] = {**(meta if isinstance(meta, dict) else {}), 'response_chat_id': id}
                 saved_message = self.upsert_message_to_history(history, message_id, message)
                 chat['history'] = history
                 chat_item.chat = chat  # chat is a fresh dict when the column was empty

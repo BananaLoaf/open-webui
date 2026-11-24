@@ -35,6 +35,35 @@ def test_response_id_accepts_normalized_database_key(responses_state):
     assert responses_state.get_stateful_response_id(messages, 'user', 'hermes') == 'resp_from_database'
 
 
+@pytest.mark.parametrize('source_chat_id', [None, 'original-chat'])
+def test_first_request_in_clone_replays_selected_branch(responses_state, source_chat_id):
+    question = {'role': 'user', 'content': 'Original question'}
+    answer = {
+        'role': 'assistant',
+        'model': 'hermes',
+        'content': 'Selected answer',
+        'responseId': 'resp_original',
+        'meta': {'response_chat_id': source_chat_id},
+    }
+    follow_up = {'role': 'user', 'content': 'Continue here', 'parentId': 'answer'}
+    messages = {'question': question, 'answer': answer, 'follow-up': follow_up}
+
+    anchor = responses_state.get_stateful_response_id(
+        messages, 'follow-up', 'hermes', chat_id='cloned-chat', cloned=True
+    )
+    assert anchor is None
+    payload = responses_state.convert_to_responses_payload({'messages': [question, answer, follow_up]})
+    assert 'previous_response_id' not in payload
+    assert [item['role'] for item in payload['input']] == ['user', 'assistant', 'user']
+
+    answer['responseId'] = 'resp_clone'
+    answer['meta']['response_chat_id'] = 'cloned-chat'
+    assert (
+        responses_state.get_stateful_response_id(messages, 'follow-up', 'hermes', chat_id='cloned-chat', cloned=True)
+        == 'resp_clone'
+    )
+
+
 def test_response_id_is_not_reused_after_model_switch(responses_state):
     messages = {
         'assistant': {'role': 'assistant', 'model': 'hermes', 'responseId': 'resp_hermes'},

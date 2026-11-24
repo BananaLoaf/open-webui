@@ -25,7 +25,9 @@ RESPONSES_LOCAL_ITEM_FIELDS = frozenset(
 )
 
 
-def get_stateful_response_id(messages_map: dict, user_message_id: str, model_id: str | None) -> str | None:
+def get_stateful_response_id(
+    messages_map: dict, user_message_id: str, model_id: str | None, *, chat_id: str | None = None, cloned: bool = False
+) -> str | None:
     """Return the response anchor for the branch containing *user_message_id*."""
     user_message = messages_map.get(user_message_id)
     if not isinstance(user_message, dict) or user_message.get('role') != 'user':
@@ -37,6 +39,13 @@ def get_stateful_response_id(messages_map: dict, user_message_id: str, model_id:
 
     parent_model = parent.get('selectedModelId') or parent.get('model')
     if parent_model and parent_model != model_id:
+        return None
+
+    # Clone and fork copy message metadata along with the transcript. Only an anchor
+    # issued for this chat can resume the clone, including clones made before scoping.
+    parent_meta = parent.get('meta')
+    response_chat_id = parent_meta.get('response_chat_id') if isinstance(parent_meta, dict) else None
+    if chat_id and (cloned or response_chat_id is not None) and response_chat_id != chat_id:
         return None
 
     response_id = parent.get('responseId') or parent.get('response_id')

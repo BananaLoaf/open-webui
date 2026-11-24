@@ -2213,11 +2213,13 @@ async def convert_url_images_to_base64(form_data, user=None):
 MESSAGE_REPLAY_KEYS = ('id', 'role', 'content', 'output', 'files', 'contextSummary', 'usage', 'model')
 
 
-async def load_stateful_response_id(chat_id: str, user_message_id: str, model_id: str | None) -> str | None:
+async def load_stateful_response_id(
+    chat_id: str, user_message_id: str, model_id: str | None, *, cloned: bool = False
+) -> str | None:
     messages_map = await Chats.get_messages_map_by_chat_id(chat_id)
     if not messages_map:
         return None
-    return get_stateful_response_id(messages_map, user_message_id, model_id)
+    return get_stateful_response_id(messages_map, user_message_id, model_id, chat_id=chat_id, cloned=cloned)
 
 
 async def is_stateful_responses_model(request, model: dict) -> bool:
@@ -2460,15 +2462,22 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     chat_id = metadata.get('chat_id')
     user_message_id = metadata.get('user_message_id')
     stateful_responses = await is_stateful_responses_model(request, model)
+    chat = await Chats.get_chat_by_id(chat_id) if is_saved_chat_id(chat_id) else None
+    cloned = bool(chat and (chat.chat or {}).get('originalChatId'))
+    seed_clone = False
 
     if stateful_responses and not form_data.get('conversation') and is_saved_chat_id(chat_id) and user_message_id:
         previous_response_id = await load_stateful_response_id(
             chat_id,
             user_message_id,
             form_data.get('model'),
+            cloned=cloned,
         )
         if previous_response_id:
             form_data['previous_response_id'] = previous_response_id
+        elif cloned:
+            form_data.pop('previous_response_id', None)
+            seed_clone = True
 
     if is_saved_chat_id(chat_id) and user_message_id:
         db_messages = await load_messages_from_db(chat_id, user_message_id)
@@ -2511,7 +2520,7 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     if regeneration_prompt:
         form_data['messages'].append({'role': 'user', 'content': regeneration_prompt})
 
-    if is_saved_chat_id(chat_id) and user_message_id and not form_data.get('previous_response_id'):
+    if is_saved_chat_id(chat_id) and user_message_id and not form_data.get('previous_response_id') and not seed_clone:
         if getattr(request.state, 'direct', False) and hasattr(request.state, 'model'):
             compaction_models = {
                 **dict(request.app.state.MODELS.items()),
@@ -2807,10 +2816,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     available_skills = []
     terminal_skills = []
     view_skill_ids = []
-    chat = None
-    if is_saved_chat_id(metadata.get('chat_id')):
-        chat = await Chats.get_chat_by_id(metadata['chat_id'])
-
     is_note_chat = bool(chat and (chat.meta or {}).get('internal') is True and (chat.meta or {}).get('type') == 'note')
 
     if is_note_chat:
@@ -4417,7 +4422,6 @@ async def non_streaming_chat_response_handler(response, ctx):
                                 'done': response_done,
                                 'role': 'assistant',
                                 'output': response_output,
-                                **({'responseId': response_id} if response_id else {}),
                                 **({'responseStatus': response_status} if response_status else {}),
                                 **(
                                     {'incompleteDetails': response_data['incomplete_details']}
@@ -4426,6 +4430,7 @@ async def non_streaming_chat_response_handler(response, ctx):
                                 ),
                                 **({'usage': usage} if usage else {}),
                             },
+                            response_id=response_id,
                         )
 
                     await publish_chat_finished_event(request, user, metadata, title, content, response_output)
@@ -6642,7 +6647,6 @@ async def streaming_chat_response_handler(response, ctx):
                         {
                             'done': True,
                             'output': current_output,
-                            **({'responseId': last_response_id} if last_response_id else {}),
                             **({'responseStatus': last_response_status} if last_response_status else {}),
                             **(
                                 {'incompleteDetails': last_incomplete_details}
@@ -6652,6 +6656,7 @@ async def streaming_chat_response_handler(response, ctx):
                             **({'error': {'content': last_response_error}} if last_response_error is not None else {}),
                             **({'usage': usage} if usage else {}),
                         },
+                        response_id=last_response_id,
                     )
 
                 await clear_response_stream(request.app.state.redis, response_stream_task_id)
